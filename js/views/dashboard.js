@@ -9,15 +9,15 @@ export async function init(db) {
   
   contentDiv.innerHTML = `
     <!-- BOTONES DE ACCIÓN RÁPIDA -->
-    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-      <a href="#/alquileres" class="btn btn-primary" style="text-decoration: none;"><i class="fa-solid fa-plus"></i> Nuevo Alquiler</a>
-      <a href="#/finanzas" class="btn btn-primary" style="text-decoration: none; background: #10b981;"><i class="fa-solid fa-money-bill-wave"></i> Finanzas / Pagos</a>
-      <a href="#/gastos" class="btn btn-primary" style="text-decoration: none; background: #ef4444;"><i class="fa-solid fa-file-invoice"></i> Registrar Gasto</a>
-      <a href="#/mantenimiento" class="btn btn-primary" style="text-decoration: none; background: #f59e0b;"><i class="fa-solid fa-wrench"></i> Mantenimiento</a>
+    <div class="dash-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+      <a href="#/alquileres" class="btn btn-primary" style="text-decoration: none; text-align: center; padding: 10px 8px; font-size: 0.85rem;"><i class="fa-solid fa-plus"></i> Nuevo Alquiler</a>
+      <a href="#/finanzas" class="btn btn-primary" style="text-decoration: none; background: #10b981; text-align: center; padding: 10px 8px; font-size: 0.85rem;"><i class="fa-solid fa-money-bill-wave"></i> Finanzas</a>
+      <a href="#/gastos" class="btn btn-primary" style="text-decoration: none; background: #ef4444; text-align: center; padding: 10px 8px; font-size: 0.85rem;"><i class="fa-solid fa-file-invoice"></i> Registrar Gasto</a>
+      <a href="#/mantenimiento" class="btn btn-primary" style="text-decoration: none; background: #f59e0b; text-align: center; padding: 10px 8px; font-size: 0.85rem;"><i class="fa-solid fa-wrench"></i> Mantenimiento</a>
     </div>
 
     <!-- TARJETAS SUPERIORES -->
-    <div class="grid-stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="grid-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
       <div class="stat-card blue">
         <div class="stat-card-icon"><i class="fa-solid fa-file-contract"></i></div>
         <div class="stat-card-label">Alquileres Activos</div>
@@ -25,7 +25,7 @@ export async function init(db) {
       </div>
       <div class="stat-card green">
         <div class="stat-card-icon"><i class="fa-solid fa-users"></i></div>
-        <div class="stat-card-label">Clientes Registrados</div>
+        <div class="stat-card-label">Clientes</div>
         <div class="stat-card-value" id="dash-clientes">-</div>
       </div>
       <div class="stat-card yellow">
@@ -35,10 +35,10 @@ export async function init(db) {
       </div>
       <div class="stat-card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
         <div class="stat-card-icon" style="color: #10b981;"><i class="fa-solid fa-wallet"></i></div>
-        <div class="stat-card-label" style="color: #94a3b8;">Ingresos (Histórico)</div>
+        <div class="stat-card-label" style="color: #94a3b8;">Ingresos</div>
         <div class="stat-card-value" id="dash-ingresos" style="color: #10b981;">-</div>
       </div>
-      <div class="stat-card" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);">
+      <div class="stat-card" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); grid-column: 1 / -1;">
         <div class="stat-card-icon" style="color: #ef4444;"><i class="fa-solid fa-hand-holding-dollar"></i></div>
         <div class="stat-card-label" style="color: #94a3b8;">Deuda en la calle</div>
         <div class="stat-card-value" id="dash-deuda" style="color: #ef4444;">-</div>
@@ -46,20 +46,20 @@ export async function init(db) {
     </div>
 
     <!-- CENTRO DE ALERTAS -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-top: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px;">
       
       <!-- Panel de Logística HOY -->
-      <div class="panel" style="border: 1px solid rgba(59, 130, 246, 0.3);">
-        <h3 style="margin-top: 0; color: #3b82f6;"><i class="fa-solid fa-calendar-day"></i> Logística de HOY</h3>
-        <div id="alertas-logistica" style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="panel" style="border: 1px solid rgba(59, 130, 246, 0.3); padding: 14px;">
+        <h3 style="margin-top: 0; color: #3b82f6; font-size: 1rem;"><i class="fa-solid fa-calendar-day"></i> Logística de HOY</h3>
+        <div id="alertas-logistica" style="display: flex; flex-direction: column; gap: 8px;">
           <p style="color: #94a3b8; font-style: italic;">Cargando...</p>
         </div>
       </div>
 
       <!-- Panel Financiero y Mantenimiento -->
-      <div class="panel" style="border: 1px solid rgba(239, 68, 68, 0.3);">
-        <h3 style="margin-top: 0; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Deudores y Mantenimiento</h3>
-        <div id="alertas-deudores" style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="panel" style="border: 1px solid rgba(239, 68, 68, 0.3); padding: 14px;">
+        <h3 style="margin-top: 0; color: #ef4444; font-size: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Deudores y Mantenimiento</h3>
+        <div id="alertas-deudores" style="display: flex; flex-direction: column; gap: 8px;">
           <p style="color: #94a3b8; font-style: italic;">Cargando...</p>
         </div>
       </div>
@@ -67,28 +67,28 @@ export async function init(db) {
     </div>
 
     <!-- GRÁFICOS -->
-    <div class="charts-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 30px;">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 20px;">
       
       <!-- Chart 1: Tendencia de Ingresos -->
-      <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; grid-column: 1 / -1;">
-        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center; margin-bottom: 15px;">Tendencia de los últimos 7 días (USD)</h3>
-        <div style="position: relative; height: 260px; width: 100%;">
+      <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px;">
+        <h3 style="margin-top: 0; font-size: 14px; color: #cbd5e1; text-align: center; margin-bottom: 12px;">Tendencia últimos 7 días (USD)</h3>
+        <div style="position: relative; height: 220px; width: 100%;">
           <canvas id="chart-tendencia"></canvas>
         </div>
       </div>
 
       <!-- Chart 2: Estado Inventario -->
-      <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
-        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center; margin-bottom: 15px;">Inventario de Lavadoras</h3>
-        <div style="position: relative; height: 260px; width: 100%;">
+      <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px;">
+        <h3 style="margin-top: 0; font-size: 14px; color: #cbd5e1; text-align: center; margin-bottom: 12px;">Inventario de Lavadoras</h3>
+        <div style="position: relative; height: 220px; width: 100%;">
           <canvas id="chart-inventario"></canvas>
         </div>
       </div>
 
       <!-- Chart 3: Métodos de Pago -->
-      <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
-        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center; margin-bottom: 15px;">Uso de Métodos de Pago</h3>
-        <div style="position: relative; height: 260px; width: 100%;">
+      <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px;">
+        <h3 style="margin-top: 0; font-size: 14px; color: #cbd5e1; text-align: center; margin-bottom: 12px;">Uso de Métodos de Pago</h3>
+        <div style="position: relative; height: 220px; width: 100%;">
           <canvas id="chart-pagos"></canvas>
         </div>
       </div>

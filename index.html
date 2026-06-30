@@ -41,18 +41,21 @@
       </nav>
     </aside>
 
+    <!-- SIDEBAR BACKDROP (mobile overlay) -->
+    <div id="sidebar-backdrop"></div>
+
     <!-- MAIN CONTENT -->
     <main style="flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left var(--transition-base); width: 100%;">
       
       <!-- HEADER -->
-      <header class="header" style="height: var(--header-height); background: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-lg); position: sticky; top: 0; z-index: var(--z-header);">
-        <button id="mobile-menu-btn" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; display: none; z-index: 2;"><i class="fa-solid fa-bars"></i></button>
+      <header class="header" style="height: var(--header-height); background: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 var(--space-lg); position: sticky; top: 0; z-index: var(--z-header);">
+        <button id="mobile-menu-btn" style="background: none; border: none; color: var(--text-primary); font-size: 1.25rem; cursor: pointer; display: none; flex-shrink: 0;"><i class="fa-solid fa-bars"></i></button>
         
-        <h2 id="mobile-top-title" style="color: var(--text-primary); font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; position: absolute; left: 50%; transform: translateX(-50%); display: none; margin: 0;">PANEL</h2>
+        <h2 id="mobile-top-title" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 700; letter-spacing: 1.5px; display: none; margin: 0; flex: 1; text-align: center;">PANEL</h2>
 
-        <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-md); z-index: 2;">
-          <span style="color: var(--text-secondary);"><i class="fa-solid fa-bell"></i></span>
-          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">A</div>
+        <div style="display: flex; align-items: center; gap: var(--space-md); flex-shrink: 0; margin-left: auto;">
+          <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-bell"></i></span>
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;">A</div>
         </div>
       </header>
 
@@ -67,7 +70,6 @@
               <p class="page-subtitle">Resumen de la actividad</p>
             </div>
           </div>
-          <!-- Contenido del dashboard se inyectará aquí -->
           <div id="dashboard-content">Cargando dashboard...</div>
         </div>
 
@@ -169,13 +171,47 @@
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-primary) !important;
     }
+
+    /* Sidebar backdrop */
+    #sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 150;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    #sidebar-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ===== MOBILE ===== */
     @media (max-width: 768px) {
-      #sidebar { width: 260px !important; transform: translateX(-100%); }
-      #sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+      #sidebar {
+        width: 270px !important;
+        transform: translateX(-100%);
+        z-index: 200 !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+      #sidebar.open {
+        transform: translateX(0);
+      }
+
       main { margin-left: 0 !important; }
-      #mobile-menu-btn { display: block !important; }
+      #mobile-menu-btn { display: flex !important; }
       #close-sidebar-btn { display: block !important; }
       #mobile-top-title { display: block !important; }
+
+      #views-container { padding: 14px !important; }
+      .page-title { font-size: 1.3rem !important; }
+      .page-subtitle { font-size: 0.8rem !important; }
+    }
+
+    @media (max-width: 480px) {
+      #views-container { padding: 10px !important; }
+      .page-title { font-size: 1.15rem !important; }
     }
   </style>
 

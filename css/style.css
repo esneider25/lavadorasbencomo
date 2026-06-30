@@ -1322,9 +1322,6 @@ h4 { font-size: var(--text-xl); }
 }
 
 @media (max-width: 768px) {
-  :root {
-    --sidebar-width: 0px;
-  }
 
   .grid-2,
   .grid-3 {

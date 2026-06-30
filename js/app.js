@@ -8,17 +8,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.getElementById('sidebar');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+  const backdrop = document.getElementById('sidebar-backdrop');
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    if (backdrop) backdrop.classList.add('active');
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('active');
+  }
 
   if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-    });
+    mobileMenuBtn.addEventListener('click', openSidebar);
   }
 
   if (closeSidebarBtn) {
-    closeSidebarBtn.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-    });
+    closeSidebarBtn.addEventListener('click', closeSidebar);
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener('click', closeSidebar);
   }
 
   // Lógica de Navegación (Tabs)
@@ -50,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cerrar sidebar en móviles tras hacer clic
     if (window.innerWidth <= 768) {
-      sidebar.classList.remove('open');
+      closeSidebar();
     }
 
     // Opcional: Cargar dinámicamente el contenido de la vista si no está cargado
