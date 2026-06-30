@@ -1,6 +1,6 @@
 {
-  "name": "LavaGestión Pro",
-  "short_name": "LavaGestión",
+  "name": "Lavadoras Bencomo",
+  "short_name": "Lavadoras Bencomo",
   "description": "Sistema de gestión premium para alquiler de lavadoras",
   "start_url": "./",
   "display": "standalone",
