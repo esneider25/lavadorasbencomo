@@ -257,28 +257,14 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(r => console.log('SW:', r.scope))
-          .catch(e => console.log('SW error:', e));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+          for(let registration of registrations) {
+            registration.unregister();
+            console.log('Service Worker unregistered.');
+          }
+        });
       });
     }
-    let deferredPrompt;
-    const btnInstall = document.getElementById('btn-install-pwa');
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); deferredPrompt = e;
-      if (btnInstall) btnInstall.style.display = 'inline-flex';
-    });
-    if (btnInstall) {
-      btnInstall.addEventListener('click', async () => {
-        if (!deferredPrompt) { alert('Abre el menú del navegador (⋮) y selecciona "Agregar a pantalla de inicio"'); return; }
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        btnInstall.style.display = 'none';
-      });
-    }
-    window.addEventListener('appinstalled', () => { if (btnInstall) btnInstall.style.display = 'none'; deferredPrompt = null; });
-    if (window.matchMedia('(display-mode: standalone)').matches && btnInstall) btnInstall.style.display = 'none';
   </script>
 </body>
 </html>
