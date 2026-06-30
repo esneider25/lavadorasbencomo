@@ -30,10 +30,11 @@ export async function init(db) {
               <th>Descripción</th>
               <th>Categoría</th>
               <th>Monto</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="gastos-tbody">
-            <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+            <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -47,7 +48,7 @@ export async function init(db) {
     try {
       const gastos = await gastosService.getAll('fecha', 'desc');
       if (gastos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay gastos registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay gastos registrados</td></tr>';
         return;
       }
 
@@ -57,13 +58,28 @@ export async function init(db) {
           <td>${g.descripcion || '-'}</td>
           <td style="text-transform: capitalize;">${g.categoria}</td>
           <td class="text-mono" style="color: red;">-${g.monto} ${g.moneda}</td>
+          <td>
+            <button class="btn btn-sm" style="background: #ef4444; color: white;" onclick="window.eliminarGasto('${g.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
         </tr>
       `).join('');
     } catch (error) {
       console.error(error);
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
     }
   }
+
+  window.eliminarGasto = async (id) => {
+    if (!confirm('¿Seguro que quieres eliminar este gasto?')) return;
+    try {
+      await gastosService.remove(id);
+      await loadGastos();
+    } catch (e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

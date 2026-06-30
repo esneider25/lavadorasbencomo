@@ -20,10 +20,11 @@ export async function init(db) {
               <th>Nombre</th>
               <th>Teléfono</th>
               <th>Dirección</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="clientes-tbody">
-            <tr><td colspan="3" style="text-align: center;">Cargando...</td></tr>
+            <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -37,7 +38,7 @@ export async function init(db) {
     try {
       const clientes = await clientesService.getAll();
       if (clientes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay clientes registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay clientes registrados</td></tr>';
         return;
       }
 
@@ -46,13 +47,28 @@ export async function init(db) {
           <td class="text-primary">${c.nombre}</td>
           <td>${c.telefono || 'N/A'}</td>
           <td>${c.direccion || 'N/A'}</td>
+          <td>
+            <button class="btn btn-sm" style="background: #ef4444; color: white;" onclick="window.eliminarCliente('${c.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
         </tr>
       `).join('');
     } catch (error) {
       console.error("Error cargando clientes:", error);
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
     }
   }
+
+  window.eliminarCliente = async (id) => {
+    if (!confirm('¿Seguro que quieres eliminar este cliente?')) return;
+    try {
+      await clientesService.remove(id);
+      await loadClientes();
+    } catch (e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

@@ -19,10 +19,11 @@ export async function init(db) {
               <th>Serial</th>
               <th>Modelo</th>
               <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="lavadoras-tbody">
-            <tr><td colspan="3" style="text-align: center;">Cargando...</td></tr>
+            <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -36,7 +37,7 @@ export async function init(db) {
     try {
       const lavadoras = await lavadorasService.getAll();
       if (lavadoras.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">No hay lavadoras registradas</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay lavadoras registradas</td></tr>';
         return;
       }
 
@@ -44,14 +45,29 @@ export async function init(db) {
         <tr>
           <td class="text-mono">${l.serial}</td>
           <td>${l.modelo || 'N/A'}</td>
-          <td><span class="badge badge-${l.estado === 'disponible' ? 'success' : (l.estado === 'alquilada' ? 'info' : 'warning')}"><div class="badge-dot"></div>${l.estado}</span></td>
+          <td><span class="badge badge-${l.estado === 'disponible' ? 'success' : (l.estado === 'alquilada' ? 'info' : (l.estado === 'mantenimiento' ? 'warning' : 'neutral'))}"><div class="badge-dot"></div>${l.estado || l.estado_lavadora}</span></td>
+          <td>
+            <button class="btn btn-sm" style="background: #ef4444; color: white;" onclick="window.eliminarLavadora('${l.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
         </tr>
       `).join('');
     } catch (error) {
       console.error("Error cargando lavadoras:", error);
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
     }
   }
+
+  window.eliminarLavadora = async (id) => {
+    if (!confirm('¿Seguro que quieres eliminar esta lavadora del inventario?')) return;
+    try {
+      await lavadorasService.remove(id);
+      await loadLavadoras();
+    } catch (e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

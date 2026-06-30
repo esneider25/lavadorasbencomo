@@ -27,10 +27,11 @@ export async function init(db) {
               <th>Técnico</th>
               <th>Costo</th>
               <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="mant-tbody">
-            <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
+            <tr><td colspan="6" style="text-align: center;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -47,7 +48,7 @@ export async function init(db) {
     try {
       const mant = await mantenimientoService.getAll('fecha_programada', 'desc');
       if (mant.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay mantenimientos registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay mantenimientos registrados</td></tr>';
         return;
       }
 
@@ -58,13 +59,28 @@ export async function init(db) {
           <td>${m.tecnico || 'No asignado'}</td>
           <td>${m.costo ? `$${m.costo}` : '-'}</td>
           <td><span class="badge badge-${m.estado === 'completado' ? 'success' : 'warning'}"><div class="badge-dot"></div>${m.estado}</span></td>
+          <td>
+            <button class="btn btn-sm" style="background: #ef4444; color: white;" onclick="window.eliminarMantenimiento('${m.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
         </tr>
       `).join('');
     } catch (error) {
       console.error(error);
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
     }
   }
+
+  window.eliminarMantenimiento = async (id) => {
+    if (!confirm('¿Seguro que quieres eliminar este registro de mantenimiento?')) return;
+    try {
+      await mantenimientoService.remove(id);
+      await loadMantenimientos();
+    } catch (e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

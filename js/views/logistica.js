@@ -29,10 +29,11 @@ export async function init(db) {
               <th>Dirección</th>
               <th>Tipo</th>
               <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="log-tbody">
-            <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+            <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -46,7 +47,7 @@ export async function init(db) {
     try {
       const despachos = await logisticaService.getAll('fecha_programada', 'desc');
       if (despachos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay movimientos logísticos</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay movimientos logísticos</td></tr>';
         return;
       }
 
@@ -56,13 +57,28 @@ export async function init(db) {
           <td>${d.direccion}</td>
           <td><span class="badge badge-${d.tipo === 'entrega' ? 'success' : 'neutral'}">${d.tipo}</span></td>
           <td><span class="badge badge-${d.estado === 'completado' ? 'success' : 'warning'}"><div class="badge-dot"></div>${d.estado.replace('_', ' ')}</span></td>
+          <td>
+            <button class="btn btn-sm" style="background: #ef4444; color: white;" onclick="window.eliminarLogistica('${d.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
         </tr>
       `).join('');
     } catch (error) {
       console.error(error);
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
     }
   }
+
+  window.eliminarLogistica = async (id) => {
+    if (!confirm('¿Seguro que quieres eliminar este despacho/recogida?')) return;
+    try {
+      await logisticaService.remove(id);
+      await loadDespachos();
+    } catch (e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

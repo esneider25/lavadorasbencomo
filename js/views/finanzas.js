@@ -26,10 +26,11 @@ export async function init(db) {
               <th>Alquiler Asociado</th>
               <th>Método de Pago</th>
               <th>Monto</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody id="pagos-tbody">
-            <tr><td colspan="4" style="text-align: center;">Cargando...</td></tr>
+            <tr><td colspan="5" style="text-align: center;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -50,7 +51,7 @@ export async function init(db) {
     try {
       const pagos = await pagosService.getAll('fecha', 'desc');
       if (pagos.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No hay pagos registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay pagos registrados</td></tr>';
         return;
       }
 
@@ -60,13 +61,28 @@ export async function init(db) {
           <td class="text-mono">${p.id_alquiler || 'General'}</td>
           <td><span class="badge badge-neutral">${metodoNombres[p.metodo] || p.metodo}</span></td>
           <td class="text-mono" style="color: green;">+${p.monto}</td>
+          <td>
+            <button class="btn btn-sm" style="background: #ef4444; color: white;" onclick="window.eliminarPago('${p.id}')">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
         </tr>
       `).join('');
     } catch (error) {
       console.error(error);
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error al cargar datos</td></tr>';
     }
   }
+
+  window.eliminarPago = async (id) => {
+    if (!confirm('¿Seguro que quieres eliminar este pago?')) return;
+    try {
+      await pagosService.remove(id);
+      await loadPagos();
+    } catch (e) {
+      alert('Error al eliminar: ' + e.message);
+    }
+  };
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
