@@ -15,6 +15,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  color-scheme: dark;
 }
 
 body {
@@ -426,6 +427,17 @@ h4 { font-size: var(--text-xl); }
   border-radius: var(--border-radius-md);
   transition: all var(--transition-fast);
   outline: none;
+  color-scheme: dark;
+}
+
+.form-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.2s;
+}
+
+.form-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }
 
 .form-input:focus,
