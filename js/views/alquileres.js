@@ -15,7 +15,8 @@ export async function init(db) {
         <select id="alq-lavadora" required class="input" style="width: 200px;">
           <option value="" disabled selected>Cargando lavadoras...</option>
         </select>
-        <input type="number" id="alq-dias" placeholder="Días de alquiler" required class="input" style="width: 150px;">
+        <input type="number" id="alq-dias" placeholder="Días" required class="input" style="width: 100px;">
+        <input type="text" id="alq-repartidor" placeholder="Repartidor/Chofer" required class="input" style="flex: 1; min-width: 150px;">
         <button type="submit" class="btn btn-primary">Iniciar Alquiler</button>
       </form>
 
@@ -74,6 +75,7 @@ export async function init(db) {
         let badgeColor = 'neutral';
         let badgeText = estadoLogistica;
         let actionButtons = '';
+        let repartidorLabel = a.repartidor ? `<div style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;"><i class="fa-solid fa-user-astronaut"></i> ${a.repartidor}</div>` : '';
 
         // Definir badges y botones según el estado logístico y de alquiler
         if (a.estado_alquiler === 'activo') {
@@ -105,7 +107,10 @@ export async function init(db) {
           <td class="text-mono">${a.id_lavadora}</td>
           <td>${a.clienteNombre || a.id_cliente}</td>
           <td>${a.dias || '-'}</td>
-          <td><span class="badge badge-${badgeColor}"><div class="badge-dot"></div>${badgeText}</span></td>
+          <td>
+            <span class="badge badge-${badgeColor}"><div class="badge-dot"></div>${badgeText}</span>
+            ${repartidorLabel}
+          </td>
           <td style="display: flex; gap: 5px;">${actionButtons}</td>
         </tr>
       `}).join('');
@@ -168,12 +173,14 @@ export async function init(db) {
       const idLavadora = selectLavadora.value;
       const clienteId = selectCliente.value;
       const clienteText = selectCliente.options[selectCliente.selectedIndex].text;
+      const repartidorVal = document.getElementById('alq-repartidor').value;
 
       await alquileresService.add({
         id_cliente: clienteId,
         clienteNombre: clienteText,
         id_lavadora: idLavadora,
         dias: document.getElementById('alq-dias').value,
+        repartidor: repartidorVal,
         estado_alquiler: 'activo',
         estado_logistica: 'entrega_pendiente', // Integración de logística inicial
         fecha_inicio: Date.now()
