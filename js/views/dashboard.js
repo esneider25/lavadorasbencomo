@@ -113,7 +113,7 @@ export async function init(db) {
     document.getElementById('dash-ingresos').textContent = '$' + totalIngresos.toFixed(2);
 
     let totalDeuda = 0;
-    activos.forEach(a => {
+    alquileres.forEach(a => {
       let deuda = (parseFloat(a.costo_total) || 0) - (parseFloat(a.pagado) || 0);
       if (deuda > 0) totalDeuda += deuda;
     });
@@ -139,6 +139,40 @@ export async function init(db) {
       `;
     });
 
+    // Calcular Deudores de TODOS los alquileres (activos e históricos)
+    alquileres.forEach(a => {
+      try {
+        let deuda = (parseFloat(a.costo_total) || 0) - (parseFloat(a.pagado) || 0);
+        if (deuda > 0) {
+          // Enlazar al whatsapp del deudor si lo tiene
+          let waBtn = '';
+          if (a.clienteTelefono) {
+             let cleanPhone = String(a.clienteTelefono).replace(/\D/g, '');
+             if (cleanPhone.length >= 10) {
+               if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
+               let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre||'Cliente') + ', le escribimos de LavaGestión para recordarle su saldo pendiente de $' + deuda.toFixed(2))}`;
+               waBtn = `<a href="${waUrl}" target="_blank" style="color: #25D366; margin-left: 5px;"><i class="fa-brands fa-whatsapp"></i> Cobrar</a>`;
+             }
+          }
+
+          htmlDeudores += `
+            <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <div>
+                <strong style="color: #ef4444;"><i class="fa-solid fa-money-bill-wave"></i> ${a.clienteNombre || 'Cliente'} debe $${deuda.toFixed(2)}</strong>
+                <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Lavadora: ${a.id_lavadora || ''} | Pagado: $${a.pagado || 0} de $${a.costo_total || 0}</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                ${waBtn}
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("Error al procesar deuda:", err);
+      }
+    });
+
+    // Calcular Logística SOLO de alquileres activos
     activos.forEach(a => {
       try {
         // --- LOGÍSTICA ---
@@ -171,33 +205,6 @@ export async function init(db) {
             <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
               <strong style="color: #ef4444;"><i class="fa-solid fa-stop"></i> Recogida / Vencido</strong>
               <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Buscar donde ${a.clienteNombre || 'Cliente'} | Vencimiento: ${new Date(msVencimiento).toLocaleDateString()} ${a.hora_retiro || ''}</div>
-            </div>
-          `;
-        }
-
-        // --- DEUDORES ---
-        let deuda = (parseFloat(a.costo_total) || 0) - (parseFloat(a.pagado) || 0);
-        if (deuda > 0) {
-          // Enlazar al whatsapp del deudor si lo tiene
-          let waBtn = '';
-          if (a.clienteTelefono) {
-             let cleanPhone = String(a.clienteTelefono).replace(/\D/g, '');
-             if (cleanPhone.length >= 10) {
-               if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
-               let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre||'Cliente') + ', le escribimos de LavaGestión para recordarle su saldo pendiente de $' + deuda.toFixed(2))}`;
-               waBtn = `<a href="${waUrl}" target="_blank" style="color: #25D366; margin-left: 5px;"><i class="fa-brands fa-whatsapp"></i> Cobrar</a>`;
-             }
-          }
-
-          htmlDeudores += `
-            <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; margin-bottom: 10px;">
-              <div>
-                <strong style="color: #ef4444;"><i class="fa-solid fa-money-bill-wave"></i> ${a.clienteNombre || 'Cliente'} debe $${deuda.toFixed(2)}</strong>
-                <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Lavadora: ${a.id_lavadora || ''} | Pagado: $${a.pagado || 0} de $${a.costo_total || 0}</div>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
-                ${waBtn}
-              </div>
             </div>
           `;
         }
