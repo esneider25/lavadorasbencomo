@@ -55,12 +55,27 @@ document.addEventListener('DOMContentLoaded', () => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       const targetId = item.getAttribute('data-target');
-      navigateTo(targetId);
+      window.location.hash = `/${targetId}`;
     });
   });
 
-  // Inicializar cargando la primera vista (dashboard)
-  navigateTo('dashboard');
+  // Escuchar cambios en la URL (hash)
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#/', '');
+    if (hash && document.getElementById(`view-${hash}`)) {
+      navigateTo(hash);
+    } else if (!hash) {
+      navigateTo('dashboard');
+    }
+  });
+
+  // Inicializar cargando la vista desde la URL o el dashboard por defecto
+  const initialHash = window.location.hash.replace('#/', '');
+  if (initialHash && document.getElementById(`view-${initialHash}`)) {
+    navigateTo(initialHash);
+  } else {
+    navigateTo('dashboard');
+  }
 });
 
 // Función para inicializar datos de cada vista (se expandirá luego)
