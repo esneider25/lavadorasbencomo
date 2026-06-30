@@ -54,6 +54,7 @@
         <h2 id="mobile-top-title" style="color: var(--text-primary); font-size: 1.1rem; font-weight: 700; letter-spacing: 1.5px; display: none; margin: 0; flex: 1; text-align: center;">PANEL</h2>
 
         <div style="display: flex; align-items: center; gap: var(--space-md); flex-shrink: 0; margin-left: auto;">
+          <button id="btn-install-pwa" style="display: none; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(16,185,129,0.35); text-transform: uppercase;"><i class="fa-solid fa-download" style="margin-right: 4px;"></i>APP</button>
           <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-bell"></i></span>
           <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;">A</div>
         </div>
@@ -161,7 +162,6 @@
   </div>
 
   <style>
-    /* Estilos adicionales para la navegación dinámica */
     .nav-item.active {
       background: var(--bg-card);
       color: var(--text-primary) !important;
@@ -172,22 +172,22 @@
       color: var(--text-primary) !important;
     }
 
-    /* Sidebar backdrop */
     #sidebar-backdrop {
       display: none;
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.55);
       z-index: 150;
-      opacity: 0;
-      transition: opacity 0.25s ease;
     }
     #sidebar-backdrop.active {
       display: block;
-      opacity: 1;
     }
 
-    /* ===== MOBILE ===== */
+    #btn-install-pwa:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 14px rgba(16,185,129,0.5);
+    }
+
     @media (max-width: 768px) {
       #sidebar {
         width: 270px !important;
@@ -198,12 +198,10 @@
       #sidebar.open {
         transform: translateX(0);
       }
-
       main { margin-left: 0 !important; }
       #mobile-menu-btn { display: flex !important; }
       #close-sidebar-btn { display: block !important; }
       #mobile-top-title { display: block !important; }
-
       #views-container { padding: 14px !important; }
       .page-title { font-size: 1.3rem !important; }
       .page-subtitle { font-size: 0.8rem !important; }
@@ -218,18 +216,50 @@
   <!-- Lógica de la aplicación -->
   <script type="module" src="./js/app.js"></script>
 
-  <!-- PWA Service Worker Registration -->
+  <!-- PWA: Service Worker + Install Prompt -->
   <script>
+    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(registration => {
-            console.log('PWA ServiceWorker registrado con éxito:', registration.scope);
-          })
-          .catch(error => {
-            console.log('Falló el registro del ServiceWorker:', error);
-          });
+          .then(r => console.log('SW registrado:', r.scope))
+          .catch(e => console.log('SW error:', e));
       });
+    }
+
+    // PWA Install Prompt
+    let deferredPrompt;
+    const btnInstall = document.getElementById('btn-install-pwa');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (btnInstall) btnInstall.style.display = 'inline-flex';
+    });
+
+    if (btnInstall) {
+      btnInstall.addEventListener('click', async () => {
+        if (!deferredPrompt) {
+          alert('Para instalar la app:\n\n1. Abre el menú del navegador (⋮)\n2. Selecciona "Agregar a pantalla de inicio"\n\n¡Listo!');
+          return;
+        }
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log('PWA install:', outcome);
+        deferredPrompt = null;
+        btnInstall.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA instalada');
+      if (btnInstall) btnInstall.style.display = 'none';
+      deferredPrompt = null;
+    });
+
+    // Si ya está instalada como PWA, ocultar botón
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      if (btnInstall) btnInstall.style.display = 'none';
     }
   </script>
 </body>
