@@ -389,8 +389,8 @@ export async function init(db) {
           <span class="badge badge-${pagoBadgeColor}">${pagoBadgeText}</span>
         `;
 
-        if (deuda > 0 && currentTab !== 'completados') {
-           actionButtons += `<button class="btn btn-sm" style="background: #10b981; color: white; width: 100%; margin-top: 5px;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
+        if (deuda > 0) {
+           actionButtons += `<button class="btn btn-sm" style="background: #10b981; color: white; width: 100%; margin-top: 5px; margin-bottom: 5px;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
         }
 
         return `
