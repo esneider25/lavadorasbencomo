@@ -383,7 +383,7 @@ export async function init(db) {
   window.eliminarRegistro = async (idAlquiler) => {
     if (!confirm('¿Eliminar del historial?')) return;
     try {
-      await alquileresService.remove(idAlquiler);
+      await alquileresService.delete(idAlquiler);
       await loadAlquileres();
     } catch (e) {
       alert('Error: ' + e.message);
