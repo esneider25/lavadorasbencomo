@@ -333,37 +333,37 @@ export async function init(db) {
         let fechaVenceStr = new Date(msVencimiento).toLocaleDateString();
 
         let tiemposHtml = `
-          <div style="font-size: 0.85rem;">
-            <div style="color: #cbd5e1; margin-bottom: 3px;" title="Inicio y Entrega"><i class="fa-solid fa-play" style="color:#3b82f6; width:15px;"></i> ${fecha}${horaEntregaStr}</div>
-            <div style="color: #ef4444;" title="Vencimiento y Retiro"><i class="fa-solid fa-stop" style="color:#ef4444; width:15px;"></i> ${fechaVenceStr}${horaRetiroStr}</div>
+          <div style="font-size: 0.85rem; display: flex; flex-wrap: wrap; gap: 10px;">
+            <div style="color: #cbd5e1;" title="Inicio y Entrega"><i class="fa-solid fa-play" style="color:#3b82f6;"></i> ${fecha}${horaEntregaStr}</div>
+            <div style="color: #ef4444;" title="Vencimiento y Retiro"><i class="fa-solid fa-stop" style="color:#ef4444;"></i> ${fechaVenceStr}${horaRetiroStr}</div>
           </div>
         `;
 
         if (a.estado_alquiler === 'activo') {
           if (estadoLogistica === 'entrega_pendiente') {
             logBadgeColor = 'warning'; logBadgeText = 'Entrega Pendiente';
-            actionButtons += `<button class="btn btn-sm" style="background: #f59e0b; color: white; width: 100%; margin-bottom: 5px;" onclick="window.cambiarLogistica('${a.id}', 'entrega_en_ruta')">🚗 Despachar</button>`;
+            actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #f59e0b; color: white;" onclick="window.cambiarLogistica('${a.id}', 'entrega_en_ruta')">🚗 Despachar</button>`;
           } else if (estadoLogistica === 'entrega_en_ruta') {
             logBadgeColor = 'info'; logBadgeText = 'En Ruta a Cliente';
-            actionButtons += `<button class="btn btn-sm" style="background: #3b82f6; color: white; width: 100%; margin-bottom: 5px;" onclick="window.cambiarLogistica('${a.id}', 'entregada')">✅ Entregada</button>`;
+            actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #3b82f6; color: white;" onclick="window.cambiarLogistica('${a.id}', 'entregada')">✅ Entregada</button>`;
           } else if (estadoLogistica === 'entregada') {
             logBadgeColor = 'success'; logBadgeText = 'En Uso';
-            actionButtons += `<button class="btn btn-sm" style="background: #ef4444; color: white; width: 100%; margin-bottom: 5px;" onclick="window.finalizarAlquiler('${a.id}', '${a.id_lavadora}')">🛑 Finalizar</button>`;
+            actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #ef4444; color: white;" onclick="window.finalizarAlquiler('${a.id}', '${a.id_lavadora}')">🛑 Finalizar</button>`;
           }
           
           // Botón de Renovar
-          actionButtons += `<button class="btn btn-sm btn-primary" style="width: 100%; margin-bottom: 5px;" onclick="window.abrirModalRenovar('${a.id}', ${a.dias}, ${a.costo_total})"><i class="fa-solid fa-arrows-rotate"></i> Renovar</button>`;
+          actionButtons += `<button class="btn btn-sm btn-primary" style="flex: 1;" onclick="window.abrirModalRenovar('${a.id}', ${a.dias}, ${a.costo_total})"><i class="fa-solid fa-arrows-rotate"></i> Renovar</button>`;
           
         } else {
           if (estadoLogistica === 'recogida_pendiente') {
             logBadgeColor = 'warning'; logBadgeText = 'Recogida Pendiente';
-            actionButtons += `<button class="btn btn-sm" style="background: #f59e0b; color: white; width: 100%; margin-bottom: 5px;" onclick="window.cambiarLogistica('${a.id}', 'recogida_en_ruta')">🚚 Buscar</button>`;
+            actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #f59e0b; color: white;" onclick="window.cambiarLogistica('${a.id}', 'recogida_en_ruta')">🚚 Buscar</button>`;
           } else if (estadoLogistica === 'recogida_en_ruta') {
             logBadgeColor = 'info'; logBadgeText = 'Regresando';
-            actionButtons += `<button class="btn btn-sm" style="background: #10b981; color: white; width: 100%; margin-bottom: 5px;" onclick="window.marcarDevuelta('${a.id}', '${a.id_lavadora}')">🏠 En Almacén</button>`;
+            actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #10b981; color: white;" onclick="window.marcarDevuelta('${a.id}', '${a.id_lavadora}')">🏠 En Almacén</button>`;
           } else {
             logBadgeColor = 'neutral'; logBadgeText = 'Completado';
-            actionButtons += `<button class="btn btn-sm" style="background: #ef4444; color: white; width: 100%; margin-bottom: 5px;" onclick="window.eliminarRegistro('${a.id}')"><i class="fa-solid fa-trash"></i> Eliminar</button>`;
+            actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #ef4444; color: white;" onclick="window.eliminarRegistro('${a.id}')"><i class="fa-solid fa-trash"></i> Eliminar</button>`;
           }
         }
 
@@ -386,30 +386,32 @@ export async function init(db) {
         }
 
         let infoPagoHtml = `
-          <div style="margin-bottom: 4px; font-weight: bold; color: #f8fafc;">$${pagado} / $${costoTotal}</div>
-          <span class="badge badge-${pagoBadgeColor}">${pagoBadgeText}</span>
+          <div style="display: inline-flex; align-items: center; gap: 8px;">
+            <div style="font-weight: bold; color: #f8fafc;">$${pagado} / $${costoTotal}</div>
+            <span class="badge badge-${pagoBadgeColor}">${pagoBadgeText}</span>
+          </div>
         `;
 
         if (deuda > 0) {
-           actionButtons += `<button class="btn btn-sm" style="background: #10b981; color: white; width: 100%; margin-top: 5px; margin-bottom: 5px;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
+           actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #10b981; color: white;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
         }
 
         return `
         <tr>
-          <td class="text-mono">${a.id_lavadora}</td>
+          <td class="text-mono" style="padding-bottom: 0;">${a.id_lavadora}</td>
           <td>
             <strong>${a.clienteNombre || a.id_cliente}</strong> ${telFormat}
             ${direccionHtml}
             ${notasHtml}
-            <br><small style="color: #94a3b8;">${a.dias} días totales</small>
+            <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px;">${a.dias} días totales</div>
           </td>
-          <td>${tiemposHtml}</td>
-          <td>
+          <td style="padding-top: 0; padding-bottom: 0;">${tiemposHtml}</td>
+          <td style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
             <span class="badge badge-${logBadgeColor}"><div class="badge-dot"></div>${logBadgeText}</span>
             ${repartidorLabel}
           </td>
-          <td>${infoPagoHtml}</td>
-          <td style="display: flex; flex-direction: column;">${actionButtons}</td>
+          <td style="padding-top: 0; padding-bottom: 4px;">${infoPagoHtml}</td>
+          <td style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 5px;">${actionButtons}</td>
         </tr>
       `}).join('');
     } catch (error) {
