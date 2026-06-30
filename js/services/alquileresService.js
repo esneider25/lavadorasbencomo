@@ -20,6 +20,7 @@ export const alquileresService = {
   async finalizar(id) {
     return service.update(id, {
       estado_alquiler: 'finalizado',
+      estado_logistica: 'recogida_pendiente',
       fecha_fin_real: Date.now(),
     });
   },
