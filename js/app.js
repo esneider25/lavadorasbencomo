@@ -43,13 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await authService.login(email, pass);
       } catch (err) {
+        console.error("Login error:", err);
         loginError.style.display = 'block';
         if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
           loginError.textContent = 'Email o contraseña incorrectos.';
         } else if (err.code === 'auth/too-many-requests') {
           loginError.textContent = 'Demasiados intentos. Espera un momento.';
         } else {
-          loginError.textContent = 'Error al iniciar sesión. Intenta de nuevo.';
+          loginError.textContent = 'Error: ' + err.message;
         }
       }
     });
@@ -80,13 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await authService.register(email, pass, name);
       } catch (err) {
+        console.error("Register error:", err);
         registerError.style.display = 'block';
         if (err.code === 'auth/email-already-in-use') {
           registerError.textContent = 'Este email ya está registrado.';
         } else if (err.code === 'auth/weak-password') {
           registerError.textContent = 'La contraseña es muy débil (mín. 6 caracteres).';
+        } else if (err.code === 'auth/operation-not-allowed') {
+          registerError.textContent = 'Firebase Auth no está activado. ¡Habilita Email/Contraseña en Firebase!';
         } else {
-          registerError.textContent = 'Error al registrar. Intenta de nuevo.';
+          registerError.textContent = 'Error: ' + err.message;
         }
       }
     });
