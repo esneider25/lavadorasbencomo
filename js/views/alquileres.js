@@ -305,7 +305,7 @@ export async function init(db) {
              if (cleanPhone.startsWith('0')) {
                 cleanPhone = '58' + cleanPhone.substring(1);
              }
-             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre || '') + ', te contactamos de LavaGestión Pro.')}`;
+             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre || '') + ', te contactamos de Lavadoras Bencomo.')}`;
              telFormat = `<a href="${waUrl}" target="_blank" title="Escribir por WhatsApp" style="color: #25D366; margin-left: 5px; font-size: 1.2em; text-decoration: none;"><i class="fa-brands fa-whatsapp"></i></a>`;
            }
         }

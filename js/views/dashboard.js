@@ -156,7 +156,7 @@ export async function init(db) {
              let cleanPhone = String(a.clienteTelefono).replace(/\D/g, '');
              if (cleanPhone.length >= 10) {
                if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
-               let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre||'Cliente') + ', le escribimos de LavaGestión para recordarle su saldo pendiente de $' + deuda.toFixed(2))}`;
+               let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre||'Cliente') + ', le escribimos de Lavadoras Bencomo para recordarle su saldo pendiente de $' + deuda.toFixed(2))}`;
                waBtn = `<a href="${waUrl}" target="_blank" style="color: #25D366; margin-left: 5px;"><i class="fa-brands fa-whatsapp"></i> Cobrar</a>`;
              }
           }

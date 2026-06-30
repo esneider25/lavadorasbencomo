@@ -132,7 +132,7 @@ export async function init(db) {
     const success = await telegramService.sendMessage(
       token, 
       chatId, 
-      '✅ <b>¡Conexión Exitosa!</b>\\nLas notificaciones de LavaGestión Pro están funcionando correctamente.'
+      '✅ <b>¡Conexión Exitosa!</b>\\nLas notificaciones de Lavadoras Bencomo están funcionando correctamente.'
     );
 
     if (success) {

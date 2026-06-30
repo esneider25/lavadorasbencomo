@@ -254,7 +254,7 @@ export async function init(db) {
              if (cleanPhone.startsWith('0')) {
                 cleanPhone = '58' + cleanPhone.substring(1);
              }
-             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (c.nombre || '') + ', le contactamos de LavaGestión Pro.')}`;
+             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (c.nombre || '') + ', le contactamos de Lavadoras Bencomo.')}`;
              waBtn = `<a href="${waUrl}" target="_blank" title="Chatear por WhatsApp" class="btn btn-sm btn-icon" style="background: #25D366; color: white; text-decoration: none; border-radius: 8px; padding: 6px 10px;"><i class="fa-brands fa-whatsapp"></i></a>`;
            }
         }
