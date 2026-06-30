@@ -121,7 +121,7 @@ export async function init(db) {
     try {
       const clientes = await clientesService.getAll('nombre', 'asc');
       selectCliente.innerHTML = '<option value="" disabled selected>Seleccione un Cliente</option>' + 
-        clientes.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+        clientes.map(c => `<option value="${c.id}" data-direccion="${c.direccion || ''}">${c.nombre}</option>`).join('');
 
       const lavadoras = await lavadorasService.getDisponibles();
       selectLavadora.innerHTML = '<option value="" disabled selected>Seleccione una Lavadora</option>' + 
@@ -159,6 +159,7 @@ export async function init(db) {
         
         let fecha = new Date(a.fecha_inicio).toLocaleDateString();
         let hora = a.hora_entrega ? `<br><small style="color:#94a3b8;"><i class="fa-regular fa-clock"></i> ${a.hora_entrega}</small>` : '';
+        let direccionHtml = a.clienteDireccion ? `<br><small style="color: #94a3b8;"><i class="fa-solid fa-location-dot"></i> ${a.clienteDireccion}</small>` : '';
 
         if (a.estado_alquiler === 'activo') {
           if (estadoLogistica === 'entrega_pendiente') {
@@ -214,7 +215,7 @@ export async function init(db) {
         return `
         <tr>
           <td class="text-mono">${a.id_lavadora}</td>
-          <td>${a.clienteNombre || a.id_cliente}<br><small style="color: #94a3b8;">${a.dias} días</small></td>
+          <td>${a.clienteNombre || a.id_cliente}${direccionHtml}<br><small style="color: #94a3b8;">${a.dias} días</small></td>
           <td>${fecha}${hora}</td>
           <td>
             <span class="badge badge-${logBadgeColor}"><div class="badge-dot"></div>${logBadgeText}</span>
@@ -325,13 +326,16 @@ export async function init(db) {
     try {
       const idLavadora = selectLavadora.value;
       const clienteId = selectCliente.value;
-      const clienteText = selectCliente.options[selectCliente.selectedIndex].text;
+      const selectedOption = selectCliente.options[selectCliente.selectedIndex];
+      const clienteText = selectedOption.text;
+      const direccionCli = selectedOption.getAttribute('data-direccion');
       
       const costoVal = document.getElementById('alq-costo').value;
 
       await alquileresService.add({
         id_cliente: clienteId,
         clienteNombre: clienteText,
+        clienteDireccion: direccionCli,
         id_lavadora: idLavadora,
         dias: document.getElementById('alq-dias').value,
         costo_total: parseFloat(costoVal),
