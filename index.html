@@ -2,12 +2,15 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="./icon-512.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LavaGestión Pro</title>
   
-  <!-- Estilos -->
+  <!-- Estilos y PWA -->
   <link rel="stylesheet" href="./css/style.css" />
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#3b82f6" />
+  <link rel="apple-touch-icon" href="./icon-512.png" />
   
   <!-- FontAwesome / Iconos (Opcional, usando un CDN para iconos) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -19,9 +22,10 @@
   <div class="app-container" style="display: flex; min-height: 100vh;">
     
     <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar" style="width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: var(--z-sidebar); transition: width var(--transition-base);">
-      <div class="sidebar-header" style="height: var(--header-height); display: flex; align-items: center; padding: 0 var(--space-lg); border-bottom: 1px solid var(--border-color);">
-        <h2 style="color: var(--text-primary); font-size: 1.2rem; font-weight: bold;">LavaGestión Pro</h2>
+    <aside class="sidebar" id="sidebar" style="width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: var(--z-sidebar); transition: width var(--transition-base), transform var(--transition-base);">
+      <div class="sidebar-header" style="height: var(--header-height); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-lg); border-bottom: 1px solid var(--border-color);">
+        <h2 style="color: var(--text-primary); font-size: 1.2rem; font-weight: bold; letter-spacing: 1px;">PANEL</h2>
+        <button id="close-sidebar-btn" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; display: none;"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <nav class="sidebar-nav" style="flex: 1; padding: var(--space-md) 0; overflow-y: auto;">
         <ul style="list-style: none; padding: 0; margin: 0;">
@@ -164,13 +168,29 @@
     }
     @media (max-width: 768px) {
       #sidebar { transform: translateX(-100%); }
-      #sidebar.open { transform: translateX(0); }
+      #sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
       main { margin-left: 0 !important; }
       #mobile-menu-btn { display: block !important; }
+      #close-sidebar-btn { display: block !important; }
     }
   </style>
 
   <!-- Lógica de la aplicación -->
   <script type="module" src="./js/app.js"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => {
+            console.log('PWA ServiceWorker registrado con éxito:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Falló el registro del ServiceWorker:', error);
+          });
+      });
+    }
+  </script>
 </body>
 </html>

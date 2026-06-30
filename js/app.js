@@ -7,10 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Manejo del menú lateral en móviles
   const sidebar = document.getElementById('sidebar');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const closeSidebarBtn = document.getElementById('close-sidebar-btn');
 
   if (mobileMenuBtn) {
     mobileMenuBtn.addEventListener('click', () => {
       sidebar.classList.toggle('open');
+    });
+  }
+
+  if (closeSidebarBtn) {
+    closeSidebarBtn.addEventListener('click', () => {
+      sidebar.classList.remove('open');
     });
   }
 

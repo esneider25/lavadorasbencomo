@@ -1,0 +1,17 @@
+{
+  "name": "LavaGestión Pro",
+  "short_name": "LavaGestión",
+  "description": "Sistema de gestión premium para alquiler de lavadoras",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#06080f",
+  "theme_color": "#3b82f6",
+  "icons": [
+    {
+      "src": "./icon-512.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
