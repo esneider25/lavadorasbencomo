@@ -75,7 +75,7 @@ export async function init(db) {
   window.eliminarMantenimiento = async (id) => {
     if (!confirm('¿Seguro que quieres eliminar este registro de mantenimiento?')) return;
     try {
-      await mantenimientoService.remove(id);
+      await mantenimientoService.delete(id);
       await loadMantenimientos();
     } catch (e) {
       alert('Error al eliminar: ' + e.message);

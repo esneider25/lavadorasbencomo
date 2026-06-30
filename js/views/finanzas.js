@@ -77,7 +77,7 @@ export async function init(db) {
   window.eliminarPago = async (id) => {
     if (!confirm('¿Seguro que quieres eliminar este pago?')) return;
     try {
-      await pagosService.remove(id);
+      await pagosService.delete(id);
       await loadPagos();
     } catch (e) {
       alert('Error al eliminar: ' + e.message);

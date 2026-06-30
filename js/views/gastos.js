@@ -74,7 +74,7 @@ export async function init(db) {
   window.eliminarGasto = async (id) => {
     if (!confirm('¿Seguro que quieres eliminar este gasto?')) return;
     try {
-      await gastosService.remove(id);
+      await gastosService.delete(id);
       await loadGastos();
     } catch (e) {
       alert('Error al eliminar: ' + e.message);

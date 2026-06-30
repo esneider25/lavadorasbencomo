@@ -271,7 +271,7 @@ export async function init(db) {
   window.eliminarLavadora = async (id) => {
     if (!confirm('¿Seguro que quieres eliminar esta lavadora del inventario?')) return;
     try {
-      await lavadorasService.remove(id);
+      await lavadorasService.delete(id);
       await loadLavadoras();
     } catch (e) {
       alert('Error al eliminar: ' + e.message);

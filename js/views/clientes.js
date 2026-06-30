@@ -63,7 +63,7 @@ export async function init(db) {
   window.eliminarCliente = async (id) => {
     if (!confirm('¿Seguro que quieres eliminar este cliente?')) return;
     try {
-      await clientesService.remove(id);
+      await clientesService.delete(id);
       await loadClientes();
     } catch (e) {
       alert('Error al eliminar: ' + e.message);
