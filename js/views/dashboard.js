@@ -34,7 +34,7 @@ export async function init(db) {
     document.getElementById('dash-clientes').textContent = clientes.length || 0;
 
     const lavadoras = await lavadorasService.getAll();
-    const disponibles = lavadoras.filter(l => l.estado_lavadora === 'disponible');
+    const disponibles = lavadoras.filter(l => l.estado === 'disponible');
     document.getElementById('dash-lavadoras').textContent = disponibles.length || 0;
   } catch (error) {
     console.error("Error cargando dashboard:", error);
