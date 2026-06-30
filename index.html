@@ -12,14 +12,117 @@
   <meta name="theme-color" content="#3b82f6" />
   <link rel="apple-touch-icon" href="./icon-512.png" />
   
-  <!-- FontAwesome / Iconos (Opcional, usando un CDN para iconos) -->
+  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="app-container" style="display: flex; min-height: 100vh;">
+
+  <!-- ============================================ -->
+  <!-- LOGIN SCREEN                                  -->
+  <!-- ============================================ -->
+  <div id="login-screen" style="display: flex; min-height: 100vh; align-items: center; justify-content: center; background: linear-gradient(135deg, #06080f 0%, #0c1021 50%, #111631 100%); padding: 20px;">
+    
+    <!-- LOGIN BOX -->
+    <div id="login-box" style="width: 100%; max-width: 400px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <img src="./icon-512.png" alt="Logo" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 8px 30px rgba(59,130,246,0.3);">
+        <h1 style="color: #e8ecf4; font-size: 1.8rem; margin: 0;">PANEL</h1>
+        <p style="color: #8892a8; font-size: 0.9rem; margin-top: 5px;">Gestión de Alquiler de Lavadoras</p>
+      </div>
+
+      <div style="background: rgba(17, 22, 49, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(99,115,148,0.15); border-radius: 16px; padding: 30px; box-shadow: 0 16px 50px rgba(0,0,0,0.6);">
+        <form id="login-form">
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; color: #8892a8; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Email</label>
+            <div style="position: relative;">
+              <i class="fa-solid fa-envelope" style="position: absolute; left: 14px; top: 13px; color: #5a6478;"></i>
+              <input type="email" id="login-email" required placeholder="tu@email.com" style="width: 100%; padding: 12px 14px 12px 42px; background: rgba(12,16,33,0.8); border: 1px solid rgba(99,115,148,0.15); border-radius: 10px; color: #e8ecf4; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(99,115,148,0.15)'">
+            </div>
+          </div>
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; color: #8892a8; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Contraseña</label>
+            <div style="position: relative;">
+              <i class="fa-solid fa-lock" style="position: absolute; left: 14px; top: 13px; color: #5a6478;"></i>
+              <input type="password" id="login-pass" required placeholder="••••••" style="width: 100%; padding: 12px 14px 12px 42px; background: rgba(12,16,33,0.8); border: 1px solid rgba(99,115,148,0.15); border-radius: 10px; color: #e8ecf4; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(99,115,148,0.15)'">
+            </div>
+          </div>
+
+          <div id="login-error" style="display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px; text-align: center;"></div>
+
+          <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); transition: transform 0.15s, box-shadow 0.15s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
+            <i class="fa-solid fa-right-to-bracket" style="margin-right: 6px;"></i>Iniciar Sesión
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(99,115,148,0.15);">
+          <span style="color: #5a6478; font-size: 0.85rem;">¿No tienes cuenta?</span>
+          <a href="#" id="toggle-register" style="color: #60a5fa; font-size: 0.85rem; text-decoration: none; font-weight: 600; margin-left: 5px;">Regístrate</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER BOX -->
+    <div id="register-box" style="display: none; width: 100%; max-width: 400px;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <img src="./icon-512.png" alt="Logo" style="width: 80px; height: 80px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 8px 30px rgba(59,130,246,0.3);">
+        <h1 style="color: #e8ecf4; font-size: 1.8rem; margin: 0;">Crear Cuenta</h1>
+        <p style="color: #8892a8; font-size: 0.9rem; margin-top: 5px;">Registra tu negocio</p>
+      </div>
+
+      <div style="background: rgba(17, 22, 49, 0.65); backdrop-filter: blur(12px); border: 1px solid rgba(99,115,148,0.15); border-radius: 16px; padding: 30px; box-shadow: 0 16px 50px rgba(0,0,0,0.6);">
+        <form id="register-form">
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; color: #8892a8; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Nombre del Negocio</label>
+            <div style="position: relative;">
+              <i class="fa-solid fa-store" style="position: absolute; left: 14px; top: 13px; color: #5a6478;"></i>
+              <input type="text" id="register-name" required placeholder="Ej: Lavadoras Bencomo" style="width: 100%; padding: 12px 14px 12px 42px; background: rgba(12,16,33,0.8); border: 1px solid rgba(99,115,148,0.15); border-radius: 10px; color: #e8ecf4; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(99,115,148,0.15)'">
+            </div>
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; color: #8892a8; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Email</label>
+            <div style="position: relative;">
+              <i class="fa-solid fa-envelope" style="position: absolute; left: 14px; top: 13px; color: #5a6478;"></i>
+              <input type="email" id="register-email" required placeholder="tu@email.com" style="width: 100%; padding: 12px 14px 12px 42px; background: rgba(12,16,33,0.8); border: 1px solid rgba(99,115,148,0.15); border-radius: 10px; color: #e8ecf4; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(99,115,148,0.15)'">
+            </div>
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; color: #8892a8; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Contraseña</label>
+            <div style="position: relative;">
+              <i class="fa-solid fa-lock" style="position: absolute; left: 14px; top: 13px; color: #5a6478;"></i>
+              <input type="password" id="register-pass" required placeholder="Mín. 6 caracteres" style="width: 100%; padding: 12px 14px 12px 42px; background: rgba(12,16,33,0.8); border: 1px solid rgba(99,115,148,0.15); border-radius: 10px; color: #e8ecf4; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(99,115,148,0.15)'">
+            </div>
+          </div>
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; color: #8892a8; font-size: 0.85rem; margin-bottom: 6px; font-weight: 500;">Confirmar Contraseña</label>
+            <div style="position: relative;">
+              <i class="fa-solid fa-lock" style="position: absolute; left: 14px; top: 13px; color: #5a6478;"></i>
+              <input type="password" id="register-pass2" required placeholder="Repite la contraseña" style="width: 100%; padding: 12px 14px 12px 42px; background: rgba(12,16,33,0.8); border: 1px solid rgba(99,115,148,0.15); border-radius: 10px; color: #e8ecf4; font-size: 0.95rem; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(59,130,246,0.5)'" onblur="this.style.borderColor='rgba(99,115,148,0.15)'">
+            </div>
+          </div>
+
+          <div id="register-error" style="display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px; text-align: center;"></div>
+
+          <button type="submit" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(16,185,129,0.3); transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
+            <i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i>Crear Cuenta
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(99,115,148,0.15);">
+          <span style="color: #5a6478; font-size: 0.85rem;">¿Ya tienes cuenta?</span>
+          <a href="#" id="toggle-login" style="color: #60a5fa; font-size: 0.85rem; text-decoration: none; font-weight: 600; margin-left: 5px;">Inicia Sesión</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================ -->
+  <!-- MAIN APP (hidden until logged in)             -->
+  <!-- ============================================ -->
+  <div id="app-container" style="display: none; min-height: 100vh;">
     
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar" style="width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: var(--z-sidebar); transition: width var(--transition-base), transform var(--transition-base);">
@@ -39,9 +142,15 @@
           <li><a href="#" class="nav-item" data-target="configuracion" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-cog" style="width: 24px;"></i> <span>Configuración</span></a></li>
         </ul>
       </nav>
+      <!-- Logout button at bottom of sidebar -->
+      <div style="padding: 16px; border-top: 1px solid var(--border-color);">
+        <button id="btn-logout" style="width: 100%; padding: 10px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s;">
+          <i class="fa-solid fa-right-from-bracket" style="margin-right: 6px;"></i>Cerrar Sesión
+        </button>
+      </div>
     </aside>
 
-    <!-- SIDEBAR BACKDROP (mobile overlay) -->
+    <!-- SIDEBAR BACKDROP -->
     <div id="sidebar-backdrop"></div>
 
     <!-- MAIN CONTENT -->
@@ -56,104 +165,50 @@
         <div style="display: flex; align-items: center; gap: var(--space-md); flex-shrink: 0; margin-left: auto;">
           <button id="btn-install-pwa" style="display: none; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(16,185,129,0.35); text-transform: uppercase;"><i class="fa-solid fa-download" style="margin-right: 4px;"></i>APP</button>
           <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-bell"></i></span>
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;">A</div>
+          <div id="user-name-display" style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;">A</div>
         </div>
       </header>
 
       <!-- VIEWS CONTAINER -->
       <div id="views-container" style="padding: var(--space-xl); flex: 1; overflow-x: hidden;">
         
-        <!-- Dashboard View -->
         <div id="view-dashboard" class="view-section page">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Dashboard</h1>
-              <p class="page-subtitle">Resumen de la actividad</p>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Dashboard</h1><p class="page-subtitle">Resumen de la actividad</p></div></div>
           <div id="dashboard-content">Cargando dashboard...</div>
         </div>
 
-        <!-- Alquileres View -->
         <div id="view-alquileres" class="view-section page" style="display: none;">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Alquileres</h1>
-              <p class="page-subtitle">Gestión de alquileres activos e históricos</p>
-            </div>
-            <div class="page-actions">
-              <button class="btn btn-primary" id="btn-nuevo-alquiler"><i class="fa-solid fa-plus"></i> Nuevo Alquiler</button>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Alquileres</h1><p class="page-subtitle">Gestión de alquileres activos e históricos</p></div><div class="page-actions"><button class="btn btn-primary" id="btn-nuevo-alquiler"><i class="fa-solid fa-plus"></i> Nuevo Alquiler</button></div></div>
           <div id="alquileres-content">Cargando alquileres...</div>
         </div>
 
-        <!-- Lavadoras View -->
         <div id="view-lavadoras" class="view-section page" style="display: none;">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Lavadoras</h1>
-              <p class="page-subtitle">Inventario de equipos</p>
-            </div>
-            <div class="page-actions">
-              <button class="btn btn-primary" id="btn-nueva-lavadora"><i class="fa-solid fa-plus"></i> Nueva Lavadora</button>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Lavadoras</h1><p class="page-subtitle">Inventario de equipos</p></div><div class="page-actions"><button class="btn btn-primary" id="btn-nueva-lavadora"><i class="fa-solid fa-plus"></i> Nueva Lavadora</button></div></div>
           <div id="lavadoras-content">Cargando lavadoras...</div>
         </div>
 
-        <!-- Clientes View -->
         <div id="view-clientes" class="view-section page" style="display: none;">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Clientes</h1>
-              <p class="page-subtitle">Directorio de clientes</p>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Clientes</h1><p class="page-subtitle">Directorio de clientes</p></div></div>
           <div id="clientes-content">Cargando clientes...</div>
         </div>
 
-        <!-- Finanzas View -->
         <div id="view-finanzas" class="view-section page" style="display: none;">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Finanzas</h1>
-              <p class="page-subtitle">Ingresos y estado financiero</p>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Finanzas</h1><p class="page-subtitle">Ingresos y estado financiero</p></div></div>
           <div id="finanzas-content">Cargando finanzas...</div>
         </div>
 
-        <!-- Gastos View -->
         <div id="view-gastos" class="view-section page" style="display: none;">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Gastos</h1>
-              <p class="page-subtitle">Registro de egresos</p>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Gastos</h1><p class="page-subtitle">Registro de egresos</p></div></div>
           <div id="gastos-content">Cargando gastos...</div>
         </div>
 
-        <!-- Mantenimiento View -->
         <div id="view-mantenimiento" class="view-section page" style="display: none;">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Mantenimiento</h1>
-              <p class="page-subtitle">Control de reparaciones</p>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Mantenimiento</h1><p class="page-subtitle">Control de reparaciones</p></div></div>
           <div id="mantenimiento-content">Cargando mantenimiento...</div>
         </div>
 
-        <!-- Configuracion View -->
         <div id="view-configuracion" class="view-section page" style="display: none;">
-          <div class="page-header">
-            <div>
-              <h1 class="page-title">Configuración</h1>
-              <p class="page-subtitle">Ajustes del sistema</p>
-            </div>
-          </div>
+          <div class="page-header"><div><h1 class="page-title">Configuración</h1><p class="page-subtitle">Ajustes del sistema</p></div></div>
           <div id="configuracion-content">Cargando configuración...</div>
         </div>
 
@@ -171,33 +226,17 @@
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-primary) !important;
     }
-
     #sidebar-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      z-index: 150;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 150;
     }
-    #sidebar-backdrop.active {
-      display: block;
-    }
-
-    #btn-install-pwa:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 14px rgba(16,185,129,0.5);
-    }
+    #sidebar-backdrop.active { display: block; }
+    #btn-install-pwa:hover { transform: scale(1.05); box-shadow: 0 4px 14px rgba(16,185,129,0.5); }
+    #btn-logout:hover { background: rgba(239,68,68,0.2) !important; }
 
     @media (max-width: 768px) {
-      #sidebar {
-        width: 270px !important;
-        transform: translateX(-100%);
-        z-index: 200 !important;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      }
-      #sidebar.open {
-        transform: translateX(0);
-      }
+      #sidebar { width: 270px !important; transform: translateX(-100%); z-index: 200 !important; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1) !important; }
+      #sidebar.open { transform: translateX(0); }
       main { margin-left: 0 !important; }
       #mobile-menu-btn { display: flex !important; }
       #close-sidebar-btn { display: block !important; }
@@ -206,61 +245,40 @@
       .page-title { font-size: 1.3rem !important; }
       .page-subtitle { font-size: 0.8rem !important; }
     }
-
     @media (max-width: 480px) {
       #views-container { padding: 10px !important; }
       .page-title { font-size: 1.15rem !important; }
     }
   </style>
 
-  <!-- Lógica de la aplicación -->
   <script type="module" src="./js/app.js"></script>
 
-  <!-- PWA: Service Worker + Install Prompt -->
+  <!-- PWA -->
   <script>
-    // Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(r => console.log('SW registrado:', r.scope))
+          .then(r => console.log('SW:', r.scope))
           .catch(e => console.log('SW error:', e));
       });
     }
-
-    // PWA Install Prompt
     let deferredPrompt;
     const btnInstall = document.getElementById('btn-install-pwa');
-
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
+      e.preventDefault(); deferredPrompt = e;
       if (btnInstall) btnInstall.style.display = 'inline-flex';
     });
-
     if (btnInstall) {
       btnInstall.addEventListener('click', async () => {
-        if (!deferredPrompt) {
-          alert('Para instalar la app:\n\n1. Abre el menú del navegador (⋮)\n2. Selecciona "Agregar a pantalla de inicio"\n\n¡Listo!');
-          return;
-        }
+        if (!deferredPrompt) { alert('Abre el menú del navegador (⋮) y selecciona "Agregar a pantalla de inicio"'); return; }
         deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log('PWA install:', outcome);
+        await deferredPrompt.userChoice;
         deferredPrompt = null;
         btnInstall.style.display = 'none';
       });
     }
-
-    window.addEventListener('appinstalled', () => {
-      console.log('PWA instalada');
-      if (btnInstall) btnInstall.style.display = 'none';
-      deferredPrompt = null;
-    });
-
-    // Si ya está instalada como PWA, ocultar botón
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      if (btnInstall) btnInstall.style.display = 'none';
-    }
+    window.addEventListener('appinstalled', () => { if (btnInstall) btnInstall.style.display = 'none'; deferredPrompt = null; });
+    if (window.matchMedia('(display-mode: standalone)').matches && btnInstall) btnInstall.style.display = 'none';
   </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 // Generic Realtime Database CRUD service factory
-import { db } from '../firebase-config.js';
+// ALL data is scoped under /usuarios/{uid}/ so each user has independent data
+import { db, authService } from '../firebase-config.js';
 import {
   ref,
   push,
@@ -13,6 +14,15 @@ import {
   equalTo,
   serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js';
+
+/**
+ * Returns the user-scoped database path: /usuarios/{uid}/{collection}
+ */
+function getUserPath(collectionName) {
+  const uid = authService.getUid();
+  if (!uid) throw new Error('Usuario no autenticado');
+  return `usuarios/${uid}/${collectionName}`;
+}
 
 /**
  * Applies filters client-side on an array of records.
@@ -68,13 +78,14 @@ function snapshotToArray(snapshot) {
 
 /**
  * Creates a CRUD service for a Realtime Database path
+ * Data is stored under /usuarios/{uid}/{collectionName}
  */
 export function createService(collectionName) {
-  const collectionRef = ref(db, collectionName);
-
   return {
     /** Add a new record with auto-generated ID */
     async add(data) {
+      const path = getUserPath(collectionName);
+      const collectionRef = ref(db, path);
       const newRef = push(collectionRef);
       const now = Date.now();
       const record = {
@@ -88,13 +99,16 @@ export function createService(collectionName) {
 
     /** Get a single record by ID */
     async getById(id) {
-      const snap = await get(ref(db, `${collectionName}/${id}`));
+      const path = getUserPath(collectionName);
+      const snap = await get(ref(db, `${path}/${id}`));
       if (!snap.exists()) return null;
       return { id: snap.key, ...snap.val() };
     },
 
     /** Get all records, sorted */
     async getAll(sortField = 'creado_en', sortDirection = 'desc') {
+      const path = getUserPath(collectionName);
+      const collectionRef = ref(db, path);
       const snap = await get(collectionRef);
       const data = snapshotToArray(snap);
       return applySort(data, sortField, sortDirection);
@@ -102,6 +116,8 @@ export function createService(collectionName) {
 
     /** Query records with filters (applied client-side) */
     async query(filters = [], sortField = 'creado_en', sortDirection = 'desc', maxResults = 100) {
+      const path = getUserPath(collectionName);
+      const collectionRef = ref(db, path);
       const snap = await get(collectionRef);
       let data = snapshotToArray(snap);
       data = applyFilters(data, filters);
@@ -111,28 +127,31 @@ export function createService(collectionName) {
 
     /** Update a record */
     async update(id, data) {
+      const path = getUserPath(collectionName);
       const updates = {
         ...data,
         actualizado_en: Date.now(),
       };
-      await update(ref(db, `${collectionName}/${id}`), updates);
+      await update(ref(db, `${path}/${id}`), updates);
       return { id, ...updates };
     },
 
     /** Delete a record */
     async delete(id) {
-      await remove(ref(db, `${collectionName}/${id}`));
+      const path = getUserPath(collectionName);
+      await remove(ref(db, `${path}/${id}`));
     },
 
     /** Subscribe to real-time changes (entire collection) */
     subscribe(callback, filters = [], sortField = 'creado_en', sortDirection = 'desc') {
+      const path = getUserPath(collectionName);
+      const collectionRef = ref(db, path);
       const unsubscribe = onValue(collectionRef, (snap) => {
         let data = snapshotToArray(snap);
         data = applyFilters(data, filters);
         data = applySort(data, sortField, sortDirection);
         callback(data);
       });
-      // onValue returns an unsubscribe function
       return unsubscribe;
     },
 
