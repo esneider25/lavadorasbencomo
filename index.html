@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LavaGestión Pro</title>
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="./css/style.css" />
+  
+  <!-- FontAwesome / Iconos (Opcional, usando un CDN para iconos) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+</head>
+<body>
+  <div class="app-container" style="display: flex; min-height: 100vh;">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" style="width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: var(--z-sidebar); transition: width var(--transition-base);">
+      <div class="sidebar-header" style="height: var(--header-height); display: flex; align-items: center; padding: 0 var(--space-lg); border-bottom: 1px solid var(--border-color);">
+        <h2 style="color: var(--text-primary); font-size: 1.2rem; font-weight: bold;">LavaGestión Pro</h2>
+      </div>
+      <nav class="sidebar-nav" style="flex: 1; padding: var(--space-md) 0; overflow-y: auto;">
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li><a href="#" class="nav-item active" data-target="dashboard" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-chart-line" style="width: 24px;"></i> <span>Dashboard</span></a></li>
+          <li><a href="#" class="nav-item" data-target="alquileres" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-file-contract" style="width: 24px;"></i> <span>Alquileres</span></a></li>
+          <li><a href="#" class="nav-item" data-target="lavadoras" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-jug-detergent" style="width: 24px;"></i> <span>Lavadoras</span></a></li>
+          <li><a href="#" class="nav-item" data-target="clientes" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-users" style="width: 24px;"></i> <span>Clientes</span></a></li>
+          <li><a href="#" class="nav-item" data-target="finanzas" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-wallet" style="width: 24px;"></i> <span>Finanzas</span></a></li>
+          <li><a href="#" class="nav-item" data-target="gastos" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-receipt" style="width: 24px;"></i> <span>Gastos</span></a></li>
+          <li><a href="#" class="nav-item" data-target="mantenimiento" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-wrench" style="width: 24px;"></i> <span>Mantenimiento</span></a></li>
+          <li><a href="#" class="nav-item" data-target="logistica" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-truck" style="width: 24px;"></i> <span>Logística</span></a></li>
+          <li><a href="#" class="nav-item" data-target="configuracion" style="display: flex; align-items: center; padding: 12px 24px; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast);"><i class="fa-solid fa-cog" style="width: 24px;"></i> <span>Configuración</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main style="flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; transition: margin-left var(--transition-base); width: 100%;">
+      
+      <!-- HEADER -->
+      <header class="header" style="height: var(--header-height); background: var(--bg-header); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-lg); position: sticky; top: 0; z-index: var(--z-header);">
+        <button id="mobile-menu-btn" style="background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; display: none;"><i class="fa-solid fa-bars"></i></button>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: var(--space-md);">
+          <span style="color: var(--text-secondary);"><i class="fa-solid fa-bell"></i></span>
+          <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">A</div>
+        </div>
+      </header>
+
+      <!-- VIEWS CONTAINER -->
+      <div id="views-container" style="padding: var(--space-xl); flex: 1; overflow-x: hidden;">
+        
+        <!-- Dashboard View -->
+        <div id="view-dashboard" class="view-section page">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Dashboard</h1>
+              <p class="page-subtitle">Resumen de la actividad</p>
+            </div>
+          </div>
+          <!-- Contenido del dashboard se inyectará aquí -->
+          <div id="dashboard-content">Cargando dashboard...</div>
+        </div>
+
+        <!-- Alquileres View -->
+        <div id="view-alquileres" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Alquileres</h1>
+              <p class="page-subtitle">Gestión de alquileres activos e históricos</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-primary" id="btn-nuevo-alquiler"><i class="fa-solid fa-plus"></i> Nuevo Alquiler</button>
+            </div>
+          </div>
+          <div id="alquileres-content">Cargando alquileres...</div>
+        </div>
+
+        <!-- Lavadoras View -->
+        <div id="view-lavadoras" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Lavadoras</h1>
+              <p class="page-subtitle">Inventario de equipos</p>
+            </div>
+          </div>
+          <div id="lavadoras-content">Cargando lavadoras...</div>
+        </div>
+
+        <!-- Clientes View -->
+        <div id="view-clientes" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Clientes</h1>
+              <p class="page-subtitle">Directorio de clientes</p>
+            </div>
+          </div>
+          <div id="clientes-content">Cargando clientes...</div>
+        </div>
+
+        <!-- Finanzas View -->
+        <div id="view-finanzas" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Finanzas</h1>
+              <p class="page-subtitle">Ingresos y estado financiero</p>
+            </div>
+          </div>
+          <div id="finanzas-content">Cargando finanzas...</div>
+        </div>
+
+        <!-- Gastos View -->
+        <div id="view-gastos" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Gastos</h1>
+              <p class="page-subtitle">Registro de egresos</p>
+            </div>
+          </div>
+          <div id="gastos-content">Cargando gastos...</div>
+        </div>
+
+        <!-- Mantenimiento View -->
+        <div id="view-mantenimiento" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Mantenimiento</h1>
+              <p class="page-subtitle">Control de reparaciones</p>
+            </div>
+          </div>
+          <div id="mantenimiento-content">Cargando mantenimiento...</div>
+        </div>
+
+        <!-- Logistica View -->
+        <div id="view-logistica" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Logística</h1>
+              <p class="page-subtitle">Rutas y entregas</p>
+            </div>
+          </div>
+          <div id="logistica-content">Cargando logística...</div>
+        </div>
+
+        <!-- Configuracion View -->
+        <div id="view-configuracion" class="view-section page" style="display: none;">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Configuración</h1>
+              <p class="page-subtitle">Ajustes del sistema</p>
+            </div>
+          </div>
+          <div id="configuracion-content">Cargando configuración...</div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <style>
+    /* Estilos adicionales para la navegación dinámica */
+    .nav-item.active {
+      background: var(--bg-card);
+      color: var(--text-primary) !important;
+      border-right: 3px solid var(--accent-blue);
+    }
+    .nav-item:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary) !important;
+    }
+    @media (max-width: 768px) {
+      #sidebar { transform: translateX(-100%); }
+      #sidebar.open { transform: translateX(0); }
+      main { margin-left: 0 !important; }
+      #mobile-menu-btn { display: block !important; }
+    }
+  </style>
+
+  <!-- Lógica de la aplicación -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
