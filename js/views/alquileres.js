@@ -9,7 +9,7 @@ export async function init(db) {
   contentDiv.innerHTML = `
     <div class="panel" style="margin-bottom: 20px;">
       <h3>Crear Nuevo Alquiler</h3>
-      <form id="form-alquileres" style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <form id="form-alquileres" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <select id="alq-cliente" required class="input" style="flex: 1; min-width: 150px;">
           <option value="" disabled selected>Cargando clientes...</option>
         </select>
@@ -18,8 +18,19 @@ export async function init(db) {
         </select>
         <input type="number" id="alq-dias" placeholder="Días" required class="input" style="width: 70px;">
         <input type="number" id="alq-costo" placeholder="Costo Total ($)" required class="input" style="width: 120px;" step="0.01">
-        <input type="time" id="alq-hora" required class="input" style="width: 110px;" title="Hora de entrega">
-        <input type="text" id="alq-repartidor" placeholder="Chofer" required class="input" style="flex: 1; min-width: 120px;">
+        
+        <div style="display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px;">
+          <small style="color: #94a3b8;">Entrega:</small>
+          <input type="time" id="alq-hora" required class="input" style="width: 100px; padding: 4px;">
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px;">
+          <small style="color: #94a3b8;">Retiro:</small>
+          <input type="time" id="alq-hora-retiro" required class="input" style="width: 100px; padding: 4px;">
+        </div>
+
+        <input type="text" id="alq-repartidor" placeholder="Chofer" required class="input" style="width: 120px;">
+        <input type="text" id="alq-notas" placeholder="Notas (Opcional)" class="input" style="flex: 1; min-width: 150px;">
         <button type="submit" class="btn btn-primary">Iniciar</button>
       </form>
     </div>
@@ -33,6 +44,13 @@ export async function init(db) {
       <div>
         <input type="text" id="alq-buscar" placeholder="🔍 Buscar cliente o lavadora..." class="input" style="width: 250px;">
       </div>
+    </div>
+
+    <!-- MINI RESUMEN -->
+    <div id="mini-resumen" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 20px; align-items: center; font-size: 0.95rem;">
+      <strong><i class="fa-solid fa-chart-pie"></i> Resumen Activos:</strong> 
+      <span>Lavadoras en calle: <b id="res-lavadoras" style="color: white;">0</b></span>
+      <span>Dinero por cobrar: <b id="res-deuda" style="color: white;">$0</b></span>
     </div>
 
     <div class="panel">
@@ -55,7 +73,7 @@ export async function init(db) {
       </div>
     </div>
 
-    <!-- MODAL DE PAGO (Oculto por defecto) -->
+    <!-- MODAL DE PAGO -->
     <div id="modal-pago" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
       <div class="panel" style="width: 400px; max-width: 90%; position: relative;">
         <button onclick="document.getElementById('modal-pago').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
@@ -64,12 +82,10 @@ export async function init(db) {
         
         <form id="form-pago-modal" style="display: flex; flex-direction: column; gap: 15px;">
           <input type="hidden" id="pago-alquiler-id">
-          
           <div>
             <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Monto a pagar ($)</label>
             <input type="number" id="pago-monto" required class="input" style="width: 100%;" step="0.01">
           </div>
-          
           <div>
             <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Método de Pago</label>
             <select id="pago-metodo" required class="input" style="width: 100%;">
@@ -79,8 +95,29 @@ export async function init(db) {
               <option value="efectivo_bs">Efectivo Bs</option>
             </select>
           </div>
-          
           <button type="submit" class="btn btn-primary" style="background: #10b981; margin-top: 10px;">Guardar Pago</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL DE RENOVAR -->
+    <div id="modal-renovar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+      <div class="panel" style="width: 400px; max-width: 90%; position: relative;">
+        <button onclick="document.getElementById('modal-renovar').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
+        <h3 style="margin-top: 0; color: #3b82f6;"><i class="fa-solid fa-arrows-rotate"></i> Renovar Alquiler</h3>
+        <p style="color: #cbd5e1; margin-bottom: 20px;">Añade más días a este alquiler en curso.</p>
+        
+        <form id="form-renovar-modal" style="display: flex; flex-direction: column; gap: 15px;">
+          <input type="hidden" id="renovar-alquiler-id">
+          <div>
+            <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Días Extra a sumar</label>
+            <input type="number" id="renovar-dias" required class="input" style="width: 100%;" min="1" value="1">
+          </div>
+          <div>
+            <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Costo Extra a sumar ($)</label>
+            <input type="number" id="renovar-costo" required class="input" style="width: 100%;" step="0.01" value="0">
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Renovar</button>
         </form>
       </div>
     </div>
@@ -91,20 +128,28 @@ export async function init(db) {
   const selectCliente = document.getElementById('alq-cliente');
   const selectLavadora = document.getElementById('alq-lavadora');
   
-  // Pestañas
   const tabActivos = document.getElementById('tab-activos');
   const tabCompletados = document.getElementById('tab-completados');
-  let currentTab = 'activos'; // 'activos' o 'completados'
+  let currentTab = 'activos';
   
-  // Buscador
   const inputBuscar = document.getElementById('alq-buscar');
+  const miniResumen = document.getElementById('mini-resumen');
+  const resLavadoras = document.getElementById('res-lavadoras');
+  const resDeuda = document.getElementById('res-deuda');
 
-  // Modal
+  // Modal Pago
   const modalPago = document.getElementById('modal-pago');
   const formPago = document.getElementById('form-pago-modal');
   const inputPagoId = document.getElementById('pago-alquiler-id');
   const inputPagoMonto = document.getElementById('pago-monto');
   const modalDeudaText = document.getElementById('modal-deuda-text');
+
+  // Modal Renovar
+  const modalRenovar = document.getElementById('modal-renovar');
+  const formRenovar = document.getElementById('form-renovar-modal');
+  const inputRenovarId = document.getElementById('renovar-alquiler-id');
+  const inputRenovarDias = document.getElementById('renovar-dias');
+  const inputRenovarCosto = document.getElementById('renovar-costo');
 
   tabActivos.addEventListener('click', () => {
     currentTab = 'activos';
@@ -112,6 +157,7 @@ export async function init(db) {
     tabActivos.style.color = 'white';
     tabCompletados.style.background = 'rgba(255,255,255,0.1)';
     tabCompletados.style.color = '#cbd5e1';
+    miniResumen.style.display = 'flex';
     loadAlquileres();
   });
 
@@ -121,6 +167,7 @@ export async function init(db) {
     tabCompletados.style.color = 'white';
     tabActivos.style.background = 'rgba(255,255,255,0.1)';
     tabActivos.style.color = '#cbd5e1';
+    miniResumen.style.display = 'none';
     loadAlquileres();
   });
 
@@ -128,7 +175,6 @@ export async function init(db) {
     loadAlquileres();
   });
 
-  // Cargar selects
   async function loadSelects() {
     try {
       const clientes = await clientesService.getAll('nombre', 'asc');
@@ -157,10 +203,25 @@ export async function init(db) {
         });
       }
       
-      // Filtrar por pestaña
+      // Filtrar por pestaña y calcular mini resumen
+      let totalLavadorasActivas = 0;
+      let totalDeudaActiva = 0;
+
       if (currentTab === 'activos') {
-        alquileres = alquileres.filter(a => a.estado_logistica !== 'devuelta');
+        alquileres = alquileres.filter(a => {
+          if (a.estado_logistica !== 'devuelta') {
+            totalLavadorasActivas++;
+            let cTotal = parseFloat(a.costo_total || 0);
+            let cPagado = parseFloat(a.pagado || 0);
+            if ((cTotal - cPagado) > 0) totalDeudaActiva += (cTotal - cPagado);
+            return true;
+          }
+          return false;
+        });
         alquileres.sort((a, b) => b.fecha_inicio - a.fecha_inicio);
+        
+        resLavadoras.textContent = totalLavadorasActivas;
+        resDeuda.textContent = '$' + totalDeudaActiva.toFixed(2);
       } else {
         alquileres = alquileres.filter(a => a.estado_logistica === 'devuelta');
         alquileres.sort((a, b) => b.fecha_fin_real - a.fecha_fin_real);
@@ -172,7 +233,6 @@ export async function init(db) {
       }
 
       tbody.innerHTML = alquileres.map(a => {
-        // --- Lógica Logística ---
         let estadoLogistica = a.estado_logistica || 'entregada';
         let logBadgeColor = 'neutral';
         let logBadgeText = estadoLogistica;
@@ -193,10 +253,12 @@ export async function init(db) {
         }
         
         let direccionHtml = a.clienteDireccion ? `<br><small style="color: #94a3b8;"><i class="fa-solid fa-location-dot"></i> ${a.clienteDireccion}</small>` : '';
+        let notasHtml = a.notas ? `<div style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); border-left: 2px solid #3b82f6; padding: 4px 6px; margin-top: 6px; color: #cbd5e1; border-radius: 0 4px 4px 0;"><i class="fa-solid fa-pen-to-square"></i> ${a.notas}</div>` : '';
 
         // --- Tiempos y Fechas ---
         let fecha = new Date(a.fecha_inicio).toLocaleDateString();
-        let hora = a.hora_entrega ? ` ${a.hora_entrega}` : '';
+        let horaEntregaStr = a.hora_entrega ? ` ${a.hora_entrega}` : '';
+        let horaRetiroStr = a.hora_retiro ? ` ${a.hora_retiro}` : (horaEntregaStr);
         
         let diasN = parseInt(a.dias) || 0;
         let msVencimiento = a.fecha_inicio + (diasN * 86400000);
@@ -204,8 +266,8 @@ export async function init(db) {
 
         let tiemposHtml = `
           <div style="font-size: 0.85rem;">
-            <div style="color: #cbd5e1; margin-bottom: 3px;" title="Inicio y Entrega"><i class="fa-solid fa-play" style="color:#3b82f6; width:15px;"></i> ${fecha}${hora}</div>
-            <div style="color: #ef4444;" title="Vencimiento"><i class="fa-solid fa-stop" style="color:#ef4444; width:15px;"></i> ${fechaVenceStr}</div>
+            <div style="color: #cbd5e1; margin-bottom: 3px;" title="Inicio y Entrega"><i class="fa-solid fa-play" style="color:#3b82f6; width:15px;"></i> ${fecha}${horaEntregaStr}</div>
+            <div style="color: #ef4444;" title="Vencimiento y Retiro"><i class="fa-solid fa-stop" style="color:#ef4444; width:15px;"></i> ${fechaVenceStr}${horaRetiroStr}</div>
           </div>
         `;
 
@@ -220,6 +282,10 @@ export async function init(db) {
             logBadgeColor = 'success'; logBadgeText = 'En Uso';
             actionButtons += `<button class="btn btn-sm" style="background: #ef4444; color: white; width: 100%; margin-bottom: 5px;" onclick="window.finalizarAlquiler('${a.id}', '${a.id_lavadora}')">🛑 Finalizar</button>`;
           }
+          
+          // Botón de Renovar
+          actionButtons += `<button class="btn btn-sm btn-primary" style="width: 100%; margin-bottom: 5px;" onclick="window.abrirModalRenovar('${a.id}', ${a.dias}, ${a.costo_total})"><i class="fa-solid fa-arrows-rotate"></i> Renovar</button>`;
+          
         } else {
           if (estadoLogistica === 'recogida_pendiente') {
             logBadgeColor = 'warning'; logBadgeText = 'Recogida Pendiente';
@@ -257,7 +323,7 @@ export async function init(db) {
         `;
 
         if (deuda > 0 && currentTab !== 'completados') {
-           actionButtons += `<button class="btn btn-sm" style="background: #10b981; color: white; width: 100%;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
+           actionButtons += `<button class="btn btn-sm" style="background: #10b981; color: white; width: 100%; margin-top: 5px;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
         }
 
         return `
@@ -266,7 +332,8 @@ export async function init(db) {
           <td>
             <strong>${a.clienteNombre || a.id_cliente}</strong> ${telFormat}
             ${direccionHtml}
-            <br><small style="color: #94a3b8;">${a.dias} días</small>
+            ${notasHtml}
+            <br><small style="color: #94a3b8;">${a.dias} días totales</small>
           </td>
           <td>${tiemposHtml}</td>
           <td>
@@ -283,7 +350,6 @@ export async function init(db) {
     }
   }
 
-  // Global functions for buttons
   window.cambiarLogistica = async (idAlquiler, nuevoEstado) => {
     try {
       await alquileresService.update(idAlquiler, { estado_logistica: nuevoEstado });
@@ -324,7 +390,7 @@ export async function init(db) {
     }
   };
 
-  // Lógica del Modal de Pago
+  // --- Modal de Pago ---
   window.abrirModalPago = (id, deudaActual) => {
     inputPagoId.value = id;
     inputPagoMonto.value = deudaActual;
@@ -337,13 +403,11 @@ export async function init(db) {
     const btn = formPago.querySelector('button');
     btn.disabled = true;
     btn.textContent = 'Guardando...';
-
     try {
       const idAlquiler = inputPagoId.value;
       const monto = parseFloat(inputPagoMonto.value);
       const metodo = document.getElementById('pago-metodo').value;
 
-      // 1. Guardar el pago en Finanzas
       await pagosService.add({
         id_alquiler: idAlquiler,
         monto: monto,
@@ -351,7 +415,6 @@ export async function init(db) {
         fecha: Date.now()
       });
 
-      // 2. Actualizar el monto pagado en el Alquiler
       const alquilerSnapshot = await alquileresService.getAll(); 
       const alqData = alquilerSnapshot.find(x => x.id === idAlquiler);
       const nuevoPagado = (parseFloat(alqData.pagado) || 0) + monto;
@@ -365,6 +428,45 @@ export async function init(db) {
     } finally {
       btn.disabled = false;
       btn.textContent = 'Guardar Pago';
+    }
+  });
+
+  // --- Modal de Renovar ---
+  window.abrirModalRenovar = async (id, diasActuales, costoActual) => {
+    inputRenovarId.value = id;
+    inputRenovarDias.value = 1; // Por defecto renovamos 1 día
+    inputRenovarCosto.value = 0; // Por defecto que decidan cuánto extra van a cobrar
+    modalRenovar.style.display = 'flex';
+  };
+
+  formRenovar.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = formRenovar.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = 'Renovando...';
+    try {
+      const idAlquiler = inputRenovarId.value;
+      const diasExtra = parseInt(inputRenovarDias.value);
+      const costoExtra = parseFloat(inputRenovarCosto.value);
+
+      const alquilerSnapshot = await alquileresService.getAll(); 
+      const alqData = alquilerSnapshot.find(x => x.id === idAlquiler);
+      
+      const nuevosDias = (parseInt(alqData.dias) || 0) + diasExtra;
+      const nuevoCosto = (parseFloat(alqData.costo_total) || 0) + costoExtra;
+
+      await alquileresService.update(idAlquiler, { 
+        dias: nuevosDias, 
+        costo_total: nuevoCosto 
+      });
+
+      modalRenovar.style.display = 'none';
+      await loadAlquileres();
+    } catch (error) {
+      alert('Error al renovar alquiler');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Renovar';
     }
   });
 
@@ -383,7 +485,11 @@ export async function init(db) {
       const direccionCli = selectedOption.getAttribute('data-direccion');
       const telefonoCli = selectedOption.getAttribute('data-telefono');
       
+      const repartidorVal = document.getElementById('alq-repartidor').value;
+      const horaVal = document.getElementById('alq-hora').value;
+      const horaRetiroVal = document.getElementById('alq-hora-retiro').value;
       const costoVal = document.getElementById('alq-costo').value;
+      const notasVal = document.getElementById('alq-notas').value;
 
       await alquileresService.add({
         id_cliente: clienteId,
@@ -394,8 +500,10 @@ export async function init(db) {
         dias: document.getElementById('alq-dias').value,
         costo_total: parseFloat(costoVal),
         pagado: 0, 
-        repartidor: document.getElementById('alq-repartidor').value,
-        hora_entrega: document.getElementById('alq-hora').value,
+        repartidor: repartidorVal,
+        hora_entrega: horaVal,
+        hora_retiro: horaRetiroVal,
+        notas: notasVal,
         estado_alquiler: 'activo',
         estado_logistica: 'entrega_pendiente',
         fecha_inicio: Date.now()
