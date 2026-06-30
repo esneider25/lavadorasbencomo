@@ -281,15 +281,15 @@ export async function init(db) {
                  let c = parseFloat(al.costo_total || 0);
                  let p = parseFloat(al.pagado || 0);
                  let d = c - p;
-                 let dHtml = d > 0 ? \`<span style="color: #ef4444;">$\${d.toFixed(2)}</span>\` : \`<span style="color: #10b981;">Solvente</span>\`;
-                 return \`
+                 let dHtml = d > 0 ? `<span style="color: #ef4444;">$${d.toFixed(2)}</span>` : `<span style="color: #10b981;">Solvente</span>`;
+                 return `
                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                   <td style="padding: 5px 0;">\${al.fecha_inicio ? new Date(al.fecha_inicio).toLocaleDateString() : 'N/A'}</td>
-                   <td style="padding: 5px 0;" class="text-mono">\${al.id_lavadora || 'N/A'}</td>
-                   <td style="padding: 5px 0; text-align: right;">$\${c.toFixed(2)}</td>
-                   <td style="padding: 5px 0; text-align: right;">\${dHtml}</td>
+                   <td style="padding: 5px 0;">${al.fecha_inicio ? new Date(al.fecha_inicio).toLocaleDateString() : 'N/A'}</td>
+                   <td style="padding: 5px 0;" class="text-mono">${al.id_lavadora || 'N/A'}</td>
+                   <td style="padding: 5px 0; text-align: right;">$${c.toFixed(2)}</td>
+                   <td style="padding: 5px 0; text-align: right;">${dHtml}</td>
                  </tr>
-                 \`;
+                 `;
                }).join('')}
              </tbody>
            </table>
