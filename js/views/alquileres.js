@@ -68,54 +68,54 @@ export async function init(db) {
         
         <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-file-contract" style="color: var(--accent-blue);"></i> Nuevo Alquiler</h2>
         
-        <form id="form-alquileres" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <form id="form-alquileres" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           
-          <div style="grid-column: span 2;">
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Cliente</label>
-            <select id="alq-cliente" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Cliente</label>
+            <select id="alq-cliente" required class="form-select">
               <option value="" disabled selected>Seleccione un Cliente...</option>
             </select>
           </div>
 
-          <div style="grid-column: span 2;">
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Lavadora</label>
-            <select id="alq-lavadora" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Lavadora</label>
+            <select id="alq-lavadora" required class="form-select">
               <option value="" disabled selected>Seleccione una Lavadora...</option>
             </select>
           </div>
 
-          <div>
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Días</label>
-            <input type="number" id="alq-dias" placeholder="Ej: 30" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          <div class="form-group">
+            <label class="form-label">Días</label>
+            <input type="number" id="alq-dias" placeholder="Ej: 30" required class="form-input">
           </div>
           
-          <div>
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Costo Total ($)</label>
-            <input type="number" id="alq-costo" placeholder="0.00" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);" step="0.01">
+          <div class="form-group">
+            <label class="form-label">Costo Total ($)</label>
+            <input type="number" id="alq-costo" placeholder="0.00" required class="form-input" step="0.01">
           </div>
           
-          <div>
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-regular fa-clock"></i> Hora Entrega</label>
-            <input type="time" id="alq-hora" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          <div class="form-group">
+            <label class="form-label"><i class="fa-regular fa-clock"></i> Hora Entrega</label>
+            <input type="time" id="alq-hora" required class="form-input">
           </div>
           
-          <div>
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-regular fa-clock"></i> Hora Retiro</label>
-            <input type="time" id="alq-hora-retiro" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          <div class="form-group">
+            <label class="form-label"><i class="fa-regular fa-clock"></i> Hora Retiro</label>
+            <input type="time" id="alq-hora-retiro" required class="form-input">
           </div>
 
-          <div style="grid-column: span 2;">
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-solid fa-truck"></i> Chofer Asignado</label>
-            <input type="text" id="alq-repartidor" placeholder="Nombre del chofer" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label"><i class="fa-solid fa-truck"></i> Chofer Asignado</label>
+            <input type="text" id="alq-repartidor" placeholder="Nombre del chofer" required class="form-input">
           </div>
 
-          <div style="grid-column: span 2;">
-            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-solid fa-pen-to-square"></i> Notas Adicionales (Opcional)</label>
-            <input type="text" id="alq-notas" placeholder="Ej: Llamar antes de llegar" class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label"><i class="fa-solid fa-pen-to-square"></i> Notas Adicionales (Opcional)</label>
+            <input type="text" id="alq-notas" placeholder="Ej: Llamar antes de llegar" class="form-input">
           </div>
 
           <div style="grid-column: span 2; margin-top: 10px;">
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; border-radius: 8px;">🚀 Iniciar Alquiler</button>
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem; border-radius: 10px; text-transform: uppercase; letter-spacing: 1px;">🚀 Iniciar Alquiler</button>
           </div>
         </form>
       </div>
