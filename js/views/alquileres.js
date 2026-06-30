@@ -306,7 +306,7 @@ export async function init(db) {
                 cleanPhone = '58' + cleanPhone.substring(1);
              }
              let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre || '') + ', te contactamos de Lavadoras Bencomo.')}`;
-             telFormat = `<a href="${waUrl}" target="_blank" title="Escribir por WhatsApp" style="color: #25D366; margin-left: 5px; font-size: 1.2em; text-decoration: none;"><i class="fa-brands fa-whatsapp"></i></a>`;
+             telFormat = `<a href="${waUrl}" target="_blank" title="Escribir por WhatsApp" style="display: inline-flex; align-items: center; justify-content: center; background: rgba(37, 211, 102, 0.15); color: #25D366; border: 1px solid rgba(37, 211, 102, 0.3); border-radius: 8px; width: 34px; height: 34px; margin-left: 10px; font-size: 1.2rem; text-decoration: none; vertical-align: middle; transition: all 0.2s;"><i class="fa-brands fa-whatsapp"></i></a>`;
            }
         }
         
