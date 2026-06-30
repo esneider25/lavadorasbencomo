@@ -207,20 +207,20 @@ export async function init(db) {
          }
       });
 
-      document.getElementById('res-gas-hoy-usd').textContent = \`-$\${hoyUSD.toFixed(2)}\`;
-      document.getElementById('res-gas-hoy-ves').textContent = \`-\${hoyVES.toFixed(2)} Bs\`;
+      document.getElementById('res-gas-hoy-usd').textContent = `-$${hoyUSD.toFixed(2)}`;
+      document.getElementById('res-gas-hoy-ves').textContent = `-${hoyVES.toFixed(2)} Bs`;
       
-      document.getElementById('res-gas-mes-usd').textContent = \`-$\${mesUSD.toFixed(2)}\`;
-      document.getElementById('res-gas-mes-ves').textContent = \`-\${mesVES.toFixed(2)} Bs\`;
+      document.getElementById('res-gas-mes-usd').textContent = `-$${mesUSD.toFixed(2)}`;
+      document.getElementById('res-gas-mes-ves').textContent = `-${mesVES.toFixed(2)} Bs`;
       
       if (currentFilter === 'rango') {
           document.getElementById('lbl-gas-total').textContent = 'Gastos en Rango';
-          document.getElementById('res-gas-total-usd').textContent = \`-$\${rangoUSD.toFixed(2)}\`;
-          document.getElementById('res-gas-total-ves').textContent = \`-\${rangoVES.toFixed(2)} Bs\`;
+          document.getElementById('res-gas-total-usd').textContent = `-$${rangoUSD.toFixed(2)}`;
+          document.getElementById('res-gas-total-ves').textContent = `-${rangoVES.toFixed(2)} Bs`;
       } else {
           document.getElementById('lbl-gas-total').textContent = 'Gastos Históricos';
-          document.getElementById('res-gas-total-usd').textContent = \`-$\${totalUSD.toFixed(2)}\`;
-          document.getElementById('res-gas-total-ves').textContent = \`-\${totalVES.toFixed(2)} Bs\`;
+          document.getElementById('res-gas-total-usd').textContent = `-$${totalUSD.toFixed(2)}`;
+          document.getElementById('res-gas-total-ves').textContent = `-${totalVES.toFixed(2)} Bs`;
       }
 
       // Filtrar la tabla según el botón activo
@@ -241,27 +241,27 @@ export async function init(db) {
       tbody.innerHTML = gastosFiltrados.map(g => {
         
         let catHtml = '';
-        if (g.categoria === 'repuestos') catHtml = \`<span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-wrench"></i> Repuestos</span>\`;
-        else if (g.categoria === 'mantenimiento') catHtml = \`<span class="badge badge-info"><i class="fa-solid fa-screwdriver-wrench"></i> Mantenimiento</span>\`;
-        else if (g.categoria === 'gasolina') catHtml = \`<span class="badge badge-warning"><i class="fa-solid fa-gas-pump"></i> Gasolina</span>\`;
-        else catHtml = \`<span class="badge badge-neutral"><i class="fa-solid fa-tag"></i> \${g.categoria || 'Otros'}</span>\`;
+        if (g.categoria === 'repuestos') catHtml = `<span class="badge" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-wrench"></i> Repuestos</span>`;
+        else if (g.categoria === 'mantenimiento') catHtml = `<span class="badge badge-info"><i class="fa-solid fa-screwdriver-wrench"></i> Mantenimiento</span>`;
+        else if (g.categoria === 'gasolina') catHtml = `<span class="badge badge-warning"><i class="fa-solid fa-gas-pump"></i> Gasolina</span>`;
+        else catHtml = `<span class="badge badge-neutral"><i class="fa-solid fa-tag"></i> ${g.categoria || 'Otros'}</span>`;
 
         let colorMonto = g.moneda === 'USD' ? '#ef4444' : '#f87171';
         let signoMonto = g.moneda === 'USD' ? '$' : 'Bs';
 
-        return \`
+        return `
           <tr style="vertical-align: middle;">
-            <td style="padding: 12px; color: #cbd5e1;">\${new Date(g.fecha).toLocaleDateString()} <span style="font-size:0.8rem; color:#64748b; margin-left:4px;">\${new Date(g.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></td>
-            <td style="padding: 12px; font-weight: 500; color: var(--text-primary); text-transform: capitalize;">\${g.descripcion || '-'}</td>
-            <td style="padding: 12px;">\${catHtml}</td>
-            <td style="padding: 12px; font-weight: bold; color: \${colorMonto}; font-size: 1.1rem;">-\${parseFloat(g.monto).toFixed(2)} \${signoMonto}</td>
+            <td style="padding: 12px; color: #cbd5e1;">${new Date(g.fecha).toLocaleDateString()} <span style="font-size:0.8rem; color:#64748b; margin-left:4px;">${new Date(g.fecha).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></td>
+            <td style="padding: 12px; font-weight: 500; color: var(--text-primary); text-transform: capitalize;">${g.descripcion || '-'}</td>
+            <td style="padding: 12px;">${catHtml}</td>
+            <td style="padding: 12px; font-weight: bold; color: ${colorMonto}; font-size: 1.1rem;">-${parseFloat(g.monto).toFixed(2)} ${signoMonto}</td>
             <td style="padding: 12px;">
-              <button class="btn btn-sm btn-icon" style="background: #ef4444; color: white; border-radius: 8px;" onclick="window.eliminarGasto('\${g.id}')" title="Eliminar Gasto">
+              <button class="btn btn-sm btn-icon" style="background: #ef4444; color: white; border-radius: 8px;" onclick="window.eliminarGasto('${g.id}')" title="Eliminar Gasto">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </td>
           </tr>
-        \`;
+        `;
       }).join('');
     } catch (error) {
       console.error(error);
