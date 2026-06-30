@@ -15,23 +15,39 @@ export async function init(db) {
       </div>
     </div>
 
-    <!-- MINI RESUMEN -->
-    <div id="mini-resumen-clientes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-      <div class="stat-card blue">
-        <div class="stat-card-icon"><i class="fa-solid fa-users"></i></div>
-        <div class="stat-card-label">Total de Clientes</div>
-        <div class="stat-card-value" id="res-cli-total">0</div>
+    <!-- MINI RESUMEN (ESTILO PREMIUM) -->
+    <div id="mini-resumen-clientes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+      
+      <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+        <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(59, 130, 246, 0.2); color: #3b82f6; display: flex; justify-content: center; align-items: center; font-size: 1.3rem;">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px;">Total de Clientes</div>
+          <strong id="res-cli-total" style="font-size: 1.4rem; color: white;">0</strong>
+        </div>
       </div>
-      <div class="stat-card green">
-        <div class="stat-card-icon"><i class="fa-solid fa-user-check"></i></div>
-        <div class="stat-card-label">Nuevos este mes</div>
-        <div class="stat-card-value" id="res-cli-nuevos">0</div>
+      
+      <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+        <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); color: #10b981; display: flex; justify-content: center; align-items: center; font-size: 1.3rem;">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px;">Nuevos este mes</div>
+          <strong id="res-cli-nuevos" style="font-size: 1.4rem; color: white;">0</strong>
+        </div>
       </div>
-      <div class="stat-card cyan">
-        <div class="stat-card-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-        <div class="stat-card-label">Clientes Activos (Con Lavadora)</div>
-        <div class="stat-card-value" id="res-cli-activos">0</div>
+      
+      <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+        <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(139, 92, 246, 0.2); color: #8b5cf6; display: flex; justify-content: center; align-items: center; font-size: 1.3rem;">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px;">Clientes Activos (Con Lavadora)</div>
+          <strong id="res-cli-activos" style="font-size: 1.4rem; color: white;">0</strong>
+        </div>
       </div>
+
     </div>
 
     <div class="panel">
@@ -39,10 +55,10 @@ export async function init(db) {
         <table class="table">
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Dirección</th>
-              <th>Acciones</th>
+              <th>Cliente</th>
+              <th>Ubicación</th>
+              <th>Estado Financiero</th>
+              <th>Acciones Rápidas</th>
             </tr>
           </thead>
           <tbody id="clientes-tbody">
@@ -134,10 +150,8 @@ export async function init(db) {
       let clientes = await clientesService.getAll();
       const alquileres = await alquileresService.getAll();
       
-      // Calcular Resumen Global
       const total = clientes.length;
       
-      // Nuevos este mes
       const hoy = new Date();
       const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1).getTime();
       let nuevos = 0;
@@ -145,11 +159,25 @@ export async function init(db) {
         if (c.creado_en >= primerDiaMes) nuevos++;
       });
       
-      // Clientes Activos (Tienen una lavadora actualmente)
+      const clientStats = {};
       let activos = 0;
       const clientesConLavadora = new Set();
+
       alquileres.forEach(a => {
-        if (a.estado_logistica !== 'devuelta' && a.id_cliente) {
+        if (!a.id_cliente) return;
+        
+        if (!clientStats[a.id_cliente]) {
+           clientStats[a.id_cliente] = { deuda: 0, alquileres: 0 };
+        }
+        clientStats[a.id_cliente].alquileres++;
+        
+        let c = parseFloat(a.costo_total || 0);
+        let p = parseFloat(a.pagado || 0);
+        if (c - p > 0) {
+            clientStats[a.id_cliente].deuda += (c - p);
+        }
+
+        if (a.estado_logistica !== 'devuelta') {
            clientesConLavadora.add(a.id_cliente);
         }
       });
@@ -159,7 +187,6 @@ export async function init(db) {
       document.getElementById('res-cli-nuevos').textContent = nuevos;
       document.getElementById('res-cli-activos').textContent = activos;
 
-      // Filtrado por Buscador
       const searchTerm = inputBuscar.value.toLowerCase().trim();
       if (searchTerm) {
         clientes = clientes.filter(c => {
@@ -176,41 +203,83 @@ export async function init(db) {
       }
 
       tbody.innerHTML = clientes.map(c => {
-        // --- WhatsApp Logic ---
-        let telFormat = c.telefono || 'N/A';
+        const stats = clientStats[c.id] || { deuda: 0, alquileres: 0 };
+        const avatarColors = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
+        const firstLetter = (c.nombre || 'A').charAt(0).toUpperCase();
+        const colorIndex = firstLetter.charCodeAt(0) % avatarColors.length;
+        const bgColor = avatarColors[colorIndex];
+
+        // Avatar UI
+        let avatarHtml = `
+          <div style="display: flex; align-items: center; gap: 12px;">
+             <div style="width: 40px; height: 40px; border-radius: 50%; background: ${bgColor}; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0; text-transform: uppercase;">
+                ${firstLetter}
+             </div>
+             <div>
+                <div style="text-transform: capitalize; font-weight: bold; color: white; font-size: 1.05rem; margin-bottom: 2px;">${c.nombre || 'Desconocido'}</div>
+                <div style="font-size: 0.85rem; color: #94a3b8;"><i class="fa-solid fa-phone" style="font-size:0.75rem;"></i> ${c.telefono || 'Sin teléfono'}</div>
+             </div>
+          </div>
+        `;
+
+        // Ubicación
+        let ubicacionHtml = `
+          <div style="display: flex; gap: 8px; align-items: flex-start; max-width: 250px;">
+            <i class="fa-solid fa-location-dot" style="color: #ef4444; margin-top: 3px;"></i>
+            <span style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.3;">${c.direccion || 'No registrada'}</span>
+          </div>
+        `;
+
+        // Estado Financiero
+        let deudaHtml = '';
+        if (stats.deuda > 0) {
+           deudaHtml = `<span class="badge badge-danger" style="display: inline-block; margin-bottom: 4px;"><div class="badge-dot"></div>Debe $${stats.deuda.toFixed(2)}</span>`;
+        } else {
+           deudaHtml = `<span class="badge badge-success" style="display: inline-block; margin-bottom: 4px;"><div class="badge-dot"></div>Solvente</span>`;
+        }
+        
+        let nivelTexto = stats.alquileres >= 5 ? '<i class="fa-solid fa-crown" style="color:#f59e0b;"></i> VIP' : (stats.alquileres >= 1 ? 'Frecuente' : 'Nuevo');
+        
+        let financieroHtml = `
+          <div style="display: flex; flex-direction: column; align-items: flex-start;">
+             ${deudaHtml}
+             <span style="font-size: 0.8rem; color: #94a3b8;">${stats.alquileres} Alquileres (${nivelTexto})</span>
+          </div>
+        `;
+
         let waBtn = '';
         if (c.telefono) {
-           let cleanPhone = c.telefono.replace(/\D/g, '');
+           let cleanPhone = c.telefono.replace(/\\D/g, '');
            if (cleanPhone.length >= 10) {
              if (cleanPhone.startsWith('0')) {
                 cleanPhone = '58' + cleanPhone.substring(1);
              }
              let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (c.nombre || '') + ', le contactamos de LavaGestión Pro.')}`;
-             waBtn = `<a href="${waUrl}" target="_blank" title="Chatear por WhatsApp" class="btn btn-sm btn-icon" style="background: #25D366; color: white; text-decoration: none;"><i class="fa-brands fa-whatsapp"></i></a>`;
+             waBtn = `<a href="${waUrl}" target="_blank" title="Chatear por WhatsApp" class="btn btn-sm btn-icon" style="background: #25D366; color: white; text-decoration: none; border-radius: 8px; padding: 6px 10px;"><i class="fa-brands fa-whatsapp"></i></a>`;
            }
         }
 
         let actionButtons = `
-          <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-            <button class="btn btn-sm btn-icon" style="background: #3b82f6; color: white;" onclick="window.verPerfilCliente('${c.id}', '${c.nombre || ''}')" title="Ver Perfil e Historial">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-sm btn-icon" style="background: #3b82f6; color: white; border-radius: 8px; padding: 6px 10px;" onclick="window.verPerfilCliente('${c.id}', '${c.nombre || ''}')" title="Ver Perfil e Historial">
               <i class="fa-solid fa-chart-line"></i>
             </button>
             ${waBtn}
-            <button class="btn btn-sm btn-icon" style="background: #8b5cf6; color: white;" onclick="window.abrirEditarCliente('${c.id}', '${c.nombre || ''}', '${c.telefono || ''}', '${c.direccion || ''}')" title="Editar Datos">
+            <button class="btn btn-sm btn-icon" style="background: #8b5cf6; color: white; border-radius: 8px; padding: 6px 10px;" onclick="window.abrirEditarCliente('${c.id}', '${c.nombre || ''}', '${c.telefono || ''}', '${c.direccion || ''}')" title="Editar Datos">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button class="btn btn-sm btn-icon" style="background: #ef4444; color: white;" onclick="window.eliminarCliente('${c.id}')" title="Eliminar Cliente">
+            <button class="btn btn-sm btn-icon" style="background: #ef4444; color: white; border-radius: 8px; padding: 6px 10px;" onclick="window.eliminarCliente('${c.id}')" title="Eliminar Cliente">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
         `;
 
         return `
-          <tr>
-            <td class="text-primary" style="text-transform: capitalize;"><strong>${c.nombre || 'N/A'}</strong></td>
-            <td>${telFormat}</td>
-            <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${c.direccion || ''}">${c.direccion || 'N/A'}</td>
-            <td>${actionButtons}</td>
+          <tr style="vertical-align: middle;">
+            <td style="padding: 12px;">${avatarHtml}</td>
+            <td style="padding: 12px;">${ubicacionHtml}</td>
+            <td style="padding: 12px;">${financieroHtml}</td>
+            <td style="padding: 12px;">${actionButtons}</td>
           </tr>
         `;
       }).join('');
@@ -281,15 +350,15 @@ export async function init(db) {
                  let c = parseFloat(al.costo_total || 0);
                  let p = parseFloat(al.pagado || 0);
                  let d = c - p;
-                 let dHtml = d > 0 ? `<span style="color: #ef4444;">$${d.toFixed(2)}</span>` : `<span style="color: #10b981;">Solvente</span>`;
-                 return `
+                 let dHtml = d > 0 ? \`<span style="color: #ef4444;">$\${d.toFixed(2)}</span>\` : \`<span style="color: #10b981;">Solvente</span>\`;
+                 return \`
                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                   <td style="padding: 5px 0;">${al.fecha_inicio ? new Date(al.fecha_inicio).toLocaleDateString() : 'N/A'}</td>
-                   <td style="padding: 5px 0;" class="text-mono">${al.id_lavadora || 'N/A'}</td>
-                   <td style="padding: 5px 0; text-align: right;">$${c.toFixed(2)}</td>
-                   <td style="padding: 5px 0; text-align: right;">${dHtml}</td>
+                   <td style="padding: 5px 0;">\${al.fecha_inicio ? new Date(al.fecha_inicio).toLocaleDateString() : 'N/A'}</td>
+                   <td style="padding: 5px 0;" class="text-mono">\${al.id_lavadora || 'N/A'}</td>
+                   <td style="padding: 5px 0; text-align: right;">$\${c.toFixed(2)}</td>
+                   <td style="padding: 5px 0; text-align: right;">\${dHtml}</td>
                  </tr>
-                 `;
+                 \`;
                }).join('')}
              </tbody>
            </table>
