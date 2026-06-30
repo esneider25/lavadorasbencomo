@@ -71,20 +71,26 @@ export async function init(db) {
       
       <!-- Chart 1: Tendencia de Ingresos -->
       <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; grid-column: 1 / -1;">
-        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center;">Tendencia de los últimos 7 días (USD)</h3>
-        <canvas id="chart-tendencia" height="100"></canvas>
+        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center; margin-bottom: 15px;">Tendencia de los últimos 7 días (USD)</h3>
+        <div style="position: relative; height: 260px; width: 100%;">
+          <canvas id="chart-tendencia"></canvas>
+        </div>
       </div>
 
       <!-- Chart 2: Estado Inventario -->
       <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
-        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center;">Inventario de Lavadoras</h3>
-        <canvas id="chart-inventario" height="200"></canvas>
+        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center; margin-bottom: 15px;">Inventario de Lavadoras</h3>
+        <div style="position: relative; height: 260px; width: 100%;">
+          <canvas id="chart-inventario"></canvas>
+        </div>
       </div>
 
       <!-- Chart 3: Métodos de Pago -->
       <div class="panel" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
-        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center;">Uso de Métodos de Pago</h3>
-        <canvas id="chart-pagos" height="200"></canvas>
+        <h3 style="margin-top: 0; font-size: 16px; color: #cbd5e1; text-align: center; margin-bottom: 15px;">Uso de Métodos de Pago</h3>
+        <div style="position: relative; height: 260px; width: 100%;">
+          <canvas id="chart-pagos"></canvas>
+        </div>
       </div>
 
     </div>
@@ -276,6 +282,7 @@ export async function init(db) {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { position: 'top', labels: { color: '#cbd5e1' } }
         },
@@ -300,6 +307,7 @@ export async function init(db) {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { position: 'bottom', labels: { color: '#cbd5e1' } }
         }
@@ -332,6 +340,7 @@ export async function init(db) {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { position: 'bottom', labels: { color: '#cbd5e1' } }
         }
