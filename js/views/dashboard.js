@@ -140,65 +140,69 @@ export async function init(db) {
     });
 
     activos.forEach(a => {
-      // --- LOGÍSTICA ---
-      
-      // 1. Alquileres NUEVOS de hoy
-      let fechaInicioMs = new Date(a.fecha_inicio).setHours(0,0,0,0);
-      if (fechaInicioMs === hoyMs) {
-        htmlLogistica += `
-          <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 10px; border-radius: 4px;">
-            <strong style="color: #10b981;"><i class="fa-solid fa-star"></i> Nuevo Alquiler Hoy</strong>
-            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">${a.clienteNombre} alquiló la lavadora ${a.id_lavadora} por ${a.dias} días.</div>
-          </div>
-        `;
-      }
-
-      // 2. Entregas pendientes (Chofer)
-      if (a.estado_logistica === 'entrega_pendiente' || a.estado_logistica === 'entrega_en_ruta') {
-        htmlLogistica += `
-          <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 10px; border-radius: 4px;">
-            <strong style="color: #3b82f6;"><i class="fa-solid fa-truck-fast"></i> Por Entregar</strong>
-            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">A: ${a.clienteNombre} | Hora: ${a.hora_entrega || 'N/A'} | Chofer: ${a.repartidor || 'N/A'}</div>
-          </div>
-        `;
-      }
-      
-      // 3. Vencimientos / Recogidas pendientes de hoy o pasadas
-      let msVencimiento = a.fecha_inicio + ((parseInt(a.dias) || 0) * 86400000);
-      if (msVencimiento < mananaMs) {
-        htmlLogistica += `
-          <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px;">
-            <strong style="color: #ef4444;"><i class="fa-solid fa-stop"></i> Recogida / Vencido</strong>
-            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Buscar donde ${a.clienteNombre} | Vencimiento: ${new Date(msVencimiento).toLocaleDateString()} ${a.hora_retiro || ''}</div>
-          </div>
-        `;
-      }
-
-      // --- DEUDORES ---
-      let deuda = (parseFloat(a.costo_total) || 0) - (parseFloat(a.pagado) || 0);
-      if (deuda > 0) {
-        // Enlazar al whatsapp del deudor si lo tiene
-        let waBtn = '';
-        if (a.clienteTelefono) {
-           let cleanPhone = a.clienteTelefono.replace(/\\D/g, '');
-           if (cleanPhone.length >= 10) {
-             if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
-             waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + a.clienteNombre + ', le escribimos de LavaGestión para recordarle su saldo pendiente de $' + deuda.toFixed(2))}`;
-             waBtn = `<a href="${waUrl}" target="_blank" style="color: #25D366; margin-left: 5px;"><i class="fa-brands fa-whatsapp"></i> Cobrar</a>`;
-           }
+      try {
+        // --- LOGÍSTICA ---
+        
+        // 1. Alquileres NUEVOS de hoy
+        let fechaInicioMs = a.fecha_inicio ? new Date(a.fecha_inicio).setHours(0,0,0,0) : 0;
+        if (fechaInicioMs === hoyMs) {
+          htmlLogistica += `
+            <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+              <strong style="color: #10b981;"><i class="fa-solid fa-star"></i> Nuevo Alquiler Hoy</strong>
+              <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">${a.clienteNombre || 'Cliente'} alquiló la lavadora ${a.id_lavadora || ''} por ${a.dias || 0} días.</div>
+            </div>
+          `;
         }
 
-        htmlDeudores += `
-          <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between;">
-            <div>
-              <strong style="color: #ef4444;"><i class="fa-solid fa-money-bill-wave"></i> ${a.clienteNombre} debe $${deuda.toFixed(2)}</strong>
-              <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Lavadora: ${a.id_lavadora} | Pagado: $${a.pagado || 0} de $${a.costo_total || 0}</div>
+        // 2. Entregas pendientes (Chofer)
+        if (a.estado_logistica === 'entrega_pendiente' || a.estado_logistica === 'entrega_en_ruta') {
+          htmlLogistica += `
+            <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+              <strong style="color: #3b82f6;"><i class="fa-solid fa-truck-fast"></i> Por Entregar</strong>
+              <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">A: ${a.clienteNombre || 'Cliente'} | Hora: ${a.hora_entrega || 'N/A'} | Chofer: ${a.repartidor || 'N/A'}</div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
-              ${waBtn}
+          `;
+        }
+        
+        // 3. Vencimientos / Recogidas pendientes de hoy o pasadas
+        let msVencimiento = (a.fecha_inicio || 0) + ((parseInt(a.dias) || 0) * 86400000);
+        if (msVencimiento < mananaMs && msVencimiento > 0) {
+          htmlLogistica += `
+            <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+              <strong style="color: #ef4444;"><i class="fa-solid fa-stop"></i> Recogida / Vencido</strong>
+              <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Buscar donde ${a.clienteNombre || 'Cliente'} | Vencimiento: ${new Date(msVencimiento).toLocaleDateString()} ${a.hora_retiro || ''}</div>
             </div>
-          </div>
-        `;
+          `;
+        }
+
+        // --- DEUDORES ---
+        let deuda = (parseFloat(a.costo_total) || 0) - (parseFloat(a.pagado) || 0);
+        if (deuda > 0) {
+          // Enlazar al whatsapp del deudor si lo tiene
+          let waBtn = '';
+          if (a.clienteTelefono) {
+             let cleanPhone = String(a.clienteTelefono).replace(/\D/g, '');
+             if (cleanPhone.length >= 10) {
+               if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
+               let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre||'Cliente') + ', le escribimos de LavaGestión para recordarle su saldo pendiente de $' + deuda.toFixed(2))}`;
+               waBtn = `<a href="${waUrl}" target="_blank" style="color: #25D366; margin-left: 5px;"><i class="fa-brands fa-whatsapp"></i> Cobrar</a>`;
+             }
+          }
+
+          htmlDeudores += `
+            <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <div>
+                <strong style="color: #ef4444;"><i class="fa-solid fa-money-bill-wave"></i> ${a.clienteNombre || 'Cliente'} debe $${deuda.toFixed(2)}</strong>
+                <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Lavadora: ${a.id_lavadora || ''} | Pagado: $${a.pagado || 0} de $${a.costo_total || 0}</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                ${waBtn}
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error("Error al procesar alquiler en dashboard:", a, err);
       }
     });
 
