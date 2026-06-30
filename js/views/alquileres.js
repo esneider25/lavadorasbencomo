@@ -2,6 +2,7 @@ import { alquileresService } from '../services/alquileresService.js';
 import { clientesService } from '../services/clientesService.js';
 import { lavadorasService } from '../services/lavadorasService.js';
 import { pagosService } from '../services/pagosService.js';
+import { telegramService } from '../services/telegramService.js';
 
 export async function init(db) {
   const contentDiv = document.getElementById('alquileres-content');
@@ -592,4 +593,55 @@ export async function init(db) {
 
   loadSelects();
   loadAlquileres();
+
+  // --- TELEGRAM WATCHER (RELOJ VIGILANTE) ---
+  // Se ejecuta cada 60 segundos (60000 ms)
+  setInterval(async () => {
+    const token = localStorage.getItem('tg_bot_token');
+    const chatId = localStorage.getItem('tg_chat_id');
+    if (!token || !chatId) return; // Si no hay configuración, no hace nada
+
+    try {
+      const alquileres = await alquileresService.getAll();
+      // Filtrar alquileres activos, que estén en uso (entregada), y que NO hayan sido notificados aún
+      const activos = alquileres.filter(a => a.estado_alquiler === 'activo' && a.estado_logistica === 'entregada' && !a.notificado_telegram);
+      
+      const ahora = Date.now();
+      
+      for (const alq of activos) {
+        let diasN = parseInt(alq.dias) || 0;
+        let msVencimiento = alq.fecha_inicio + (diasN * 86400000);
+        
+        // Ajustar la hora exacta de retiro si está definida
+        if (alq.hora_retiro) {
+          const [h, m] = alq.hora_retiro.split(':');
+          const vDate = new Date(msVencimiento);
+          vDate.setHours(parseInt(h), parseInt(m), 0, 0);
+          msVencimiento = vDate.getTime();
+        }
+
+        const msRestantes = msVencimiento - ahora;
+        const minsRestantes = Math.floor(msRestantes / 60000);
+
+        // Si faltan 60 minutos o menos (incluso si ya se pasó a números negativos)
+        if (minsRestantes <= 60) {
+           const success = await telegramService.sendAlertaRecogida(
+             token, 
+             chatId, 
+             alq.id_lavadora, 
+             alq.clienteNombre || 'Cliente', 
+             alq.clienteDireccion || 'Dirección no registrada', 
+             minsRestantes
+           );
+           
+           if (success) {
+             // Marcar en la base de datos para no volver a notificar este mismo alquiler
+             await alquileresService.update(alq.id, { notificado_telegram: true });
+           }
+        }
+      }
+    } catch (e) {
+      console.error('Error en vigilante Telegram:', e);
+    }
+  }, 60000);
 }

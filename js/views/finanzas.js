@@ -1,6 +1,7 @@
 import { pagosService } from '../services/pagosService.js';
 import { alquileresService } from '../services/alquileresService.js';
 import { clientesService } from '../services/clientesService.js';
+import { telegramService } from '../services/telegramService.js';
 
 export async function init(db) {
   const contentDiv = document.getElementById('finanzas-content');
@@ -8,7 +9,11 @@ export async function init(db) {
   contentDiv.innerHTML = `
     <!-- HEADER -->
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; background: var(--bg-card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-      <button id="btn-nuevo-pago" class="btn btn-primary" style="border-radius: 8px; padding: 10px 20px; font-weight: bold;"><i class="fa-solid fa-plus"></i> Registrar Pago</button>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button id="btn-nuevo-pago" class="btn btn-primary" style="border-radius: 8px; padding: 10px 20px; font-weight: bold;"><i class="fa-solid fa-plus"></i> Registrar Pago</button>
+        <button id="btn-tg-cierre" class="btn" style="border-radius: 8px; padding: 10px 15px; font-weight: bold; background: #0088cc; color: white;"><i class="fa-brands fa-telegram"></i> Cierre Diario</button>
+        <button id="btn-tg-deudores" class="btn" style="border-radius: 8px; padding: 10px 15px; font-weight: bold; background: transparent; border: 1px solid #0088cc; color: #0088cc;"><i class="fa-brands fa-telegram"></i> Reporte Deudores</button>
+      </div>
       
       <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <button class="btn btn-sm btn-filter active" data-filter="hoy" style="border-radius: 8px; padding: 8px 15px; background: var(--bg-card-hover); border: 1px solid var(--border-color);">Hoy</button>
@@ -305,6 +310,103 @@ export async function init(db) {
       btn.innerHTML = '💰 Guardar Ingreso';
     }
   });
+
+  // --- TELEGRAM LOGIC ---
+  const btnTgCierre = document.getElementById('btn-tg-cierre');
+  if (btnTgCierre) {
+    btnTgCierre.addEventListener('click', async () => {
+       const token = localStorage.getItem('tg_bot_token');
+       const chatId = localStorage.getItem('tg_chat_id');
+       if (!token || !chatId) return alert('Configura tu bot de Telegram primero en Ajustes.');
+
+       btnTgCierre.disabled = true;
+       const originalHtml = btnTgCierre.innerHTML;
+       btnTgCierre.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Enviando...';
+
+       try {
+         const pagos = await pagosService.getAll();
+         const ahora = new Date();
+         const inicioHoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
+         
+         const pagosHoy = pagos.filter(p => p.fecha >= inicioHoy);
+         
+         const resumenData = {
+           pago_movil: { total: 0, count: 0 },
+           transferencia: { total: 0, count: 0 },
+           efectivo_bs: { total: 0, count: 0 },
+           efectivo_usd: { total: 0, count: 0 },
+         };
+
+         pagosHoy.forEach(p => {
+           const m = parseFloat(p.monto || 0);
+           const met = p.metodo || 'otro';
+           if (resumenData[met]) {
+             resumenData[met].total += m;
+             resumenData[met].count++;
+           }
+         });
+
+         const success = await telegramService.sendCierreCaja(token, chatId, resumenData);
+         if (success) alert('✅ Cierre de caja enviado a Telegram con éxito.');
+         else alert('Error al enviar. Revisa la configuración del bot.');
+       } catch (e) {
+         console.error(e);
+         alert('Error generando cierre: ' + e.message);
+       } finally {
+         btnTgCierre.disabled = false;
+         btnTgCierre.innerHTML = originalHtml;
+       }
+    });
+  }
+
+  const btnTgDeudores = document.getElementById('btn-tg-deudores');
+  if (btnTgDeudores) {
+    btnTgDeudores.addEventListener('click', async () => {
+       const token = localStorage.getItem('tg_bot_token');
+       const chatId = localStorage.getItem('tg_chat_id');
+       if (!token || !chatId) return alert('Configura tu bot de Telegram primero en Ajustes.');
+
+       btnTgDeudores.disabled = true;
+       const originalHtml = btnTgDeudores.innerHTML;
+       btnTgDeudores.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Enviando...';
+
+       try {
+         const alquileres = await alquileresService.getAll();
+         const activos = alquileres.filter(a => a.estado_alquiler === 'activo');
+         
+         let pendientes = [];
+         activos.forEach(a => {
+           let cTotal = parseFloat(a.costo_total || 0);
+           let cPagado = parseFloat(a.pagado || 0);
+           let deuda = cTotal - cPagado;
+           if (deuda > 0) {
+             pendientes.push({
+               clienteNombre: a.clienteNombre || 'Cliente',
+               moneda: '$',
+               monto: deuda.toFixed(2)
+             });
+           }
+         });
+
+         if (pendientes.length === 0) {
+            alert('¡Genial! No tienes cobros pendientes.');
+            btnTgDeudores.disabled = false;
+            btnTgDeudores.innerHTML = originalHtml;
+            return;
+         }
+
+         const success = await telegramService.sendResumenPagos(token, chatId, pendientes);
+         if (success) alert('✅ Reporte de deudores enviado a Telegram.');
+         else alert('Error al enviar. Revisa la configuración del bot.');
+       } catch (e) {
+         console.error(e);
+         alert('Error generando reporte: ' + e.message);
+       } finally {
+         btnTgDeudores.disabled = false;
+         btnTgDeudores.innerHTML = originalHtml;
+       }
+    });
+  }
 
   // Init filter and load
   loadPagos();
