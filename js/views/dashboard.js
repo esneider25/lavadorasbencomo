@@ -8,6 +8,14 @@ export async function init(db) {
   const contentDiv = document.getElementById('dashboard-content');
   
   contentDiv.innerHTML = `
+    <!-- BOTONES DE ACCIÓN RÁPIDA -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+      <a href="#/alquileres" class="btn btn-primary" style="text-decoration: none;"><i class="fa-solid fa-plus"></i> Nuevo Alquiler</a>
+      <a href="#/finanzas" class="btn btn-primary" style="text-decoration: none; background: #10b981;"><i class="fa-solid fa-money-bill-wave"></i> Finanzas / Pagos</a>
+      <a href="#/gastos" class="btn btn-primary" style="text-decoration: none; background: #ef4444;"><i class="fa-solid fa-file-invoice"></i> Registrar Gasto</a>
+      <a href="#/mantenimiento" class="btn btn-primary" style="text-decoration: none; background: #f59e0b;"><i class="fa-solid fa-wrench"></i> Mantenimiento</a>
+    </div>
+
     <!-- TARJETAS SUPERIORES -->
     <div class="grid-stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
       <div class="stat-card blue">
@@ -37,12 +45,25 @@ export async function init(db) {
       </div>
     </div>
 
-    <!-- PENDIENTES DE HOY -->
-    <div class="panel" style="margin-top: 20px; border: 1px solid rgba(245, 158, 11, 0.3);">
-      <h3 style="margin-top: 0; color: #f59e0b;"><i class="fa-solid fa-bell"></i> Pendientes de HOY</h3>
-      <div id="alertas-container">
-        <p style="color: #94a3b8; font-style: italic;">Cargando tareas...</p>
+    <!-- CENTRO DE ALERTAS -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-top: 20px;">
+      
+      <!-- Panel de Logística HOY -->
+      <div class="panel" style="border: 1px solid rgba(59, 130, 246, 0.3);">
+        <h3 style="margin-top: 0; color: #3b82f6;"><i class="fa-solid fa-calendar-day"></i> Logística de HOY</h3>
+        <div id="alertas-logistica" style="display: flex; flex-direction: column; gap: 10px;">
+          <p style="color: #94a3b8; font-style: italic;">Cargando...</p>
+        </div>
       </div>
+
+      <!-- Panel Financiero y Mantenimiento -->
+      <div class="panel" style="border: 1px solid rgba(239, 68, 68, 0.3);">
+        <h3 style="margin-top: 0; color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Deudores y Mantenimiento</h3>
+        <div id="alertas-deudores" style="display: flex; flex-direction: column; gap: 10px;">
+          <p style="color: #94a3b8; font-style: italic;">Cargando...</p>
+        </div>
+      </div>
+
     </div>
 
     <!-- GRÁFICOS -->
@@ -99,46 +120,93 @@ export async function init(db) {
     document.getElementById('dash-deuda').textContent = '$' + totalDeuda.toFixed(2);
 
 
-    // 3. Generar Alertas de HOY
+    // 3. Generar Alertas
     const hoy = new Date();
     hoy.setHours(0,0,0,0);
     const hoyMs = hoy.getTime();
     const mananaMs = hoyMs + 86400000;
 
-    let alertasHtml = '';
+    let htmlLogistica = '';
+    let htmlDeudores = '';
     
+    // Alertas de Lavadoras en Mantenimiento
+    mantenimiento.forEach(l => {
+      htmlDeudores += `
+        <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 10px; border-radius: 4px;">
+          <strong style="color: #f59e0b;"><i class="fa-solid fa-wrench"></i> Lavadora Dañada</strong>
+          <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Serial: ${l.serial} - ${l.modelo} requiere atención.</div>
+        </div>
+      `;
+    });
+
     activos.forEach(a => {
-      // Alerta de Entrega
+      // --- LOGÍSTICA ---
+      
+      // 1. Alquileres NUEVOS de hoy
+      let fechaInicioMs = new Date(a.fecha_inicio).setHours(0,0,0,0);
+      if (fechaInicioMs === hoyMs) {
+        htmlLogistica += `
+          <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 10px; border-radius: 4px;">
+            <strong style="color: #10b981;"><i class="fa-solid fa-star"></i> Nuevo Alquiler Hoy</strong>
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">${a.clienteNombre} alquiló la lavadora ${a.id_lavadora} por ${a.dias} días.</div>
+          </div>
+        `;
+      }
+
+      // 2. Entregas pendientes (Chofer)
       if (a.estado_logistica === 'entrega_pendiente' || a.estado_logistica === 'entrega_en_ruta') {
-        alertasHtml += `
-          <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 12px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong style="color: white;"><i class="fa-solid fa-truck-fast" style="color: #3b82f6;"></i> Entrega Pendiente: ${a.clienteNombre}</strong>
-              <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Lavadora: ${a.id_lavadora} | Hora Entrega: ${a.hora_entrega || 'N/A'} | Dirección: ${a.clienteDireccion || 'N/A'}</div>
-            </div>
+        htmlLogistica += `
+          <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 10px; border-radius: 4px;">
+            <strong style="color: #3b82f6;"><i class="fa-solid fa-truck-fast"></i> Por Entregar</strong>
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">A: ${a.clienteNombre} | Hora: ${a.hora_entrega || 'N/A'} | Chofer: ${a.repartidor || 'N/A'}</div>
           </div>
         `;
       }
       
-      // Alerta de Vencimiento / Recogida
+      // 3. Vencimientos / Recogidas pendientes de hoy o pasadas
       let msVencimiento = a.fecha_inicio + ((parseInt(a.dias) || 0) * 86400000);
       if (msVencimiento < mananaMs) {
-        // Vence hoy o ya está vencido
-        alertasHtml += `
-          <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 12px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
+        htmlLogistica += `
+          <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px;">
+            <strong style="color: #ef4444;"><i class="fa-solid fa-stop"></i> Recogida / Vencido</strong>
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Buscar donde ${a.clienteNombre} | Vencimiento: ${new Date(msVencimiento).toLocaleDateString()} ${a.hora_retiro || ''}</div>
+          </div>
+        `;
+      }
+
+      // --- DEUDORES ---
+      let deuda = (parseFloat(a.costo_total) || 0) - (parseFloat(a.pagado) || 0);
+      if (deuda > 0) {
+        // Enlazar al whatsapp del deudor si lo tiene
+        let waBtn = '';
+        if (a.clienteTelefono) {
+           let cleanPhone = a.clienteTelefono.replace(/\\D/g, '');
+           if (cleanPhone.length >= 10) {
+             if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
+             waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + a.clienteNombre + ', le escribimos de LavaGestión para recordarle su saldo pendiente de $' + deuda.toFixed(2))}`;
+             waBtn = `<a href="${waUrl}" target="_blank" style="color: #25D366; margin-left: 5px;"><i class="fa-brands fa-whatsapp"></i> Cobrar</a>`;
+           }
+        }
+
+        htmlDeudores += `
+          <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 10px; border-radius: 4px; display: flex; justify-content: space-between;">
             <div>
-              <strong style="color: white;"><i class="fa-solid fa-clock" style="color: #f59e0b;"></i> Vencimiento / Recogida: ${a.clienteNombre}</strong>
-              <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Lavadora: ${a.id_lavadora} | Fecha: ${new Date(msVencimiento).toLocaleDateString()} | Debe: $${((parseFloat(a.costo_total)||0) - (parseFloat(a.pagado)||0)).toFixed(2)}</div>
+              <strong style="color: #ef4444;"><i class="fa-solid fa-money-bill-wave"></i> ${a.clienteNombre} debe $${deuda.toFixed(2)}</strong>
+              <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Lavadora: ${a.id_lavadora} | Pagado: $${a.pagado || 0} de $${a.costo_total || 0}</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+              ${waBtn}
             </div>
           </div>
         `;
       }
     });
 
-    if (alertasHtml === '') {
-      alertasHtml = '<p style="color: #10b981; margin: 0;"><i class="fa-solid fa-check-circle"></i> ¡Todo al día! No hay entregas ni recogidas pendientes para hoy.</p>';
-    }
-    document.getElementById('alertas-container').innerHTML = alertasHtml;
+    if (htmlLogistica === '') htmlLogistica = '<p style="color: #10b981; margin: 0;"><i class="fa-solid fa-check-circle"></i> Todo al día en logística.</p>';
+    if (htmlDeudores === '') htmlDeudores = '<p style="color: #10b981; margin: 0;"><i class="fa-solid fa-check-circle"></i> Nadie debe dinero ni hay lavadoras dañadas.</p>';
+    
+    document.getElementById('alertas-logistica').innerHTML = htmlLogistica;
+    document.getElementById('alertas-deudores').innerHTML = htmlDeudores;
 
 
     // 4. PREPARAR GRÁFICOS
