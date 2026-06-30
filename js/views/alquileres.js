@@ -313,9 +313,19 @@ export async function init(db) {
         let notasHtml = a.notas ? `<div style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); border-left: 2px solid #3b82f6; padding: 4px 6px; margin-top: 6px; color: #cbd5e1; border-radius: 0 4px 4px 0;"><i class="fa-solid fa-pen-to-square"></i> ${a.notas}</div>` : '';
 
         // --- Tiempos y Fechas ---
+        const formatAMPM = (timeStr) => {
+          if (!timeStr) return '';
+          let [h, m] = timeStr.split(':');
+          h = parseInt(h);
+          const ampm = h >= 12 ? 'PM' : 'AM';
+          h = h % 12;
+          h = h ? h : 12; 
+          return `${h}:${m} ${ampm}`;
+        };
+
         let fecha = new Date(a.fecha_inicio).toLocaleDateString();
-        let horaEntregaStr = a.hora_entrega ? ` ${a.hora_entrega}` : '';
-        let horaRetiroStr = a.hora_retiro ? ` ${a.hora_retiro}` : (horaEntregaStr);
+        let horaEntregaStr = a.hora_entrega ? ` ${formatAMPM(a.hora_entrega)}` : '';
+        let horaRetiroStr = a.hora_retiro ? ` ${formatAMPM(a.hora_retiro)}` : (horaEntregaStr);
         
         let diasN = parseInt(a.dias) || 0;
         let msVencimiento = a.fecha_inicio + (diasN * 86400000);
