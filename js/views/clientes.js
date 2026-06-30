@@ -9,9 +9,9 @@ export async function init(db) {
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; background: var(--bg-card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
       <button id="btn-nuevo-cliente" class="btn btn-primary" style="border-radius: 8px; padding: 10px 20px; font-weight: bold;"><i class="fa-solid fa-user-plus"></i> Nuevo Cliente</button>
       
-      <div style="position: relative;">
+      <div style="position: relative; flex: 1; min-width: 200px; max-width: 350px;">
         <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
-        <input type="text" id="cli-buscar" placeholder="Buscar por nombre, tlf o dir..." class="input" style="width: 300px; padding-left: 35px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
+        <input type="text" id="cli-buscar" placeholder="Buscar por nombre, tlf o dir..." class="input" style="width: 100%; padding-left: 35px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
       </div>
     </div>
 
