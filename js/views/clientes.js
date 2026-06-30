@@ -249,37 +249,37 @@ export async function init(db) {
 
         let waBtn = '';
         if (c.telefono) {
-           let cleanPhone = c.telefono.replace(/\\D/g, '');
+           let cleanPhone = c.telefono.replace(/\D/g, '');
            if (cleanPhone.length >= 10) {
              if (cleanPhone.startsWith('0')) {
                 cleanPhone = '58' + cleanPhone.substring(1);
              }
              let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (c.nombre || '') + ', le contactamos de Lavadoras Bencomo.')}`;
-             waBtn = `<a href="${waUrl}" target="_blank" title="Chatear por WhatsApp" class="btn btn-sm btn-icon" style="background: #25D366; color: white; text-decoration: none; border-radius: 8px; padding: 6px 10px;"><i class="fa-brands fa-whatsapp"></i></a>`;
+             waBtn = `<a href="${waUrl}" target="_blank" title="Chatear por WhatsApp" class="btn btn-sm btn-icon" style="flex: 1; min-width: 40px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; padding: 8px; display: inline-flex; justify-content: center; align-items: center;"><i class="fa-brands fa-whatsapp"></i></a>`;
            }
         }
 
         let actionButtons = `
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-sm btn-icon" style="background: #3b82f6; color: white; border-radius: 8px; padding: 6px 10px;" onclick="window.verPerfilCliente('${c.id}', '${c.nombre || ''}')" title="Ver Perfil e Historial">
+          <div style="display: flex; gap: 5px; flex-wrap: wrap; width: 100%;">
+            <button class="btn btn-sm btn-icon" style="flex: 1; min-width: 40px; background: #3b82f6; color: white; border-radius: 8px; padding: 8px;" onclick="window.verPerfilCliente('${c.id}', '${c.nombre || ''}')" title="Ver Perfil e Historial">
               <i class="fa-solid fa-chart-line"></i>
             </button>
             ${waBtn}
-            <button class="btn btn-sm btn-icon" style="background: #8b5cf6; color: white; border-radius: 8px; padding: 6px 10px;" onclick="window.abrirEditarCliente('${c.id}', '${c.nombre || ''}', '${c.telefono || ''}', '${c.direccion || ''}')" title="Editar Datos">
+            <button class="btn btn-sm btn-icon" style="flex: 1; min-width: 40px; background: #8b5cf6; color: white; border-radius: 8px; padding: 8px;" onclick="window.abrirEditarCliente('${c.id}', '${c.nombre || ''}', '${c.telefono || ''}', '${c.direccion || ''}')" title="Editar Datos">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button class="btn btn-sm btn-icon" style="background: #ef4444; color: white; border-radius: 8px; padding: 6px 10px;" onclick="window.eliminarCliente('${c.id}')" title="Eliminar Cliente">
+            <button class="btn btn-sm btn-icon" style="flex: 1; min-width: 40px; background: #ef4444; color: white; border-radius: 8px; padding: 8px;" onclick="window.eliminarCliente('${c.id}')" title="Eliminar Cliente">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
         `;
 
         return `
-          <tr style="vertical-align: middle;">
-            <td style="padding: 12px;">${avatarHtml}</td>
-            <td style="padding: 12px;">${ubicacionHtml}</td>
-            <td style="padding: 12px;">${financieroHtml}</td>
-            <td style="padding: 12px;">${actionButtons}</td>
+          <tr>
+            <td style="padding-bottom: 4px;">${avatarHtml}</td>
+            <td style="padding-top: 0; padding-bottom: 4px;">${ubicacionHtml}</td>
+            <td style="padding-top: 0; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);">${financieroHtml}</td>
+            <td style="padding-top: 8px;">${actionButtons}</td>
           </tr>
         `;
       }).join('');

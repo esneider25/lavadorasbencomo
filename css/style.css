@@ -1414,8 +1414,8 @@ h4 { font-size: var(--text-xl); }
   #mini-resumen-finanzas,
   #mini-resumen-gastos,
   #mini-resumen-mant {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
   }
 
   /* Stat cards: compact on mobile */
