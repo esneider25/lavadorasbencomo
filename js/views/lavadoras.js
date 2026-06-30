@@ -44,7 +44,7 @@ export async function init(db) {
         <tr>
           <td class="text-mono">${l.serial}</td>
           <td>${l.modelo || 'N/A'}</td>
-          <td><span class="badge badge-${l.estado_lavadora === 'disponible' ? 'success' : (l.estado_lavadora === 'alquilada' ? 'info' : 'warning')}"><div class="badge-dot"></div>${l.estado_lavadora}</span></td>
+          <td><span class="badge badge-${l.estado === 'disponible' ? 'success' : (l.estado === 'alquilada' ? 'info' : 'warning')}"><div class="badge-dot"></div>${l.estado}</span></td>
         </tr>
       `).join('');
     } catch (error) {
@@ -63,7 +63,7 @@ export async function init(db) {
       await lavadorasService.add({
         serial: document.getElementById('lav-serial').value,
         modelo: document.getElementById('lav-modelo').value,
-        estado_lavadora: 'disponible'
+        estado: 'disponible'
       });
       form.reset();
       await loadLavadoras();
