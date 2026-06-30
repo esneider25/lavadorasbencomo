@@ -1329,7 +1329,8 @@ h4 { font-size: var(--text-xl); }
   }
 
   .grid-stats {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
   }
 
   .form-row {
@@ -1339,6 +1340,7 @@ h4 { font-size: var(--text-xl); }
   .page-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
   }
 
   .modal {
@@ -1346,7 +1348,146 @@ h4 { font-size: var(--text-xl); }
     max-height: calc(100vh - 32px);
   }
 
-  /* Responsive Tables */
+  /* ===== GLOBAL: All view header/toolbar bars ===== */
+  /* Force toolbar bars to stack vertically */
+  #alquileres-content > div:first-child,
+  #lavadoras-content > div:first-child,
+  #clientes-content > div:first-child,
+  #finanzas-content > div:first-child,
+  #gastos-content > div:first-child,
+  #mantenimiento-content > div:first-child {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  /* ===== GLOBAL: Search inputs full width ===== */
+  #alquileres-content input[type="text"],
+  #lavadoras-content input[type="text"],
+  #clientes-content input[type="text"],
+  #finanzas-content input[type="text"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Search wrapper should be full width */
+  #alquileres-content > div:first-child > div:last-child,
+  #lavadoras-content > div:first-child > div:last-child,
+  #clientes-content > div:first-child > div:last-child {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: unset !important;
+  }
+
+  /* ===== GLOBAL: Filter buttons row scrollable ===== */
+  #finanzas-content > div:first-child > div:last-child,
+  #gastos-content > div:first-child > div:last-child,
+  #mantenimiento-content > div:first-child > div:last-child {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Date range filter: full width, no left border */
+  #finanzas-content > div:first-child div[style*="border-left"],
+  #gastos-content > div:first-child div[style*="border-left"],
+  #mantenimiento-content > div:first-child div[style*="border-left"] {
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+
+  /* Date inputs wider on mobile */
+  input[type="date"] {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ===== GLOBAL: Mini-resumen grids stack on mobile ===== */
+  #mini-resumen,
+  #mini-resumen-lavadoras,
+  #mini-resumen-clientes,
+  #mini-resumen-finanzas,
+  #mini-resumen-gastos,
+  #mini-resumen-mant {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Stat cards: compact on mobile */
+  .stat-card {
+    padding: 12px !important;
+  }
+  .stat-card-icon {
+    font-size: 1rem !important;
+  }
+  .stat-card-label {
+    font-size: 0.75rem !important;
+  }
+  .stat-card-value {
+    font-size: 1.3rem !important;
+  }
+
+  /* ===== GLOBAL: Buttons full width on mobile ===== */
+  #btn-nuevo-pago,
+  #btn-nuevo-gasto,
+  #btn-nuevo-mant,
+  #btn-nuevo-cliente {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Telegram buttons row */
+  #finanzas-content > div:first-child > div:first-child {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  #btn-tg-cierre,
+  #btn-tg-deudores {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* ===== GLOBAL: Tabs row (alquileres) ===== */
+  #alquileres-content > div:first-child > div:first-child {
+    width: 100% !important;
+  }
+  #tab-activos,
+  #tab-completados {
+    flex: 1;
+    text-align: center;
+    font-size: 0.8rem !important;
+    padding: 8px 10px !important;
+  }
+
+  /* Filter chip buttons */
+  #lav-filtros {
+    width: 100% !important;
+  }
+  .btn-filtro {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem !important;
+    padding: 6px 8px !important;
+  }
+
+  /* ===== GLOBAL: Form modals ===== */
+  form[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  form[style*="grid-template-columns: 1fr 1fr"] > div[style*="grid-column: span 2"] {
+    grid-column: span 1 !important;
+  }
+  form[style*="grid-template-columns: 1fr 1fr"] > div[style*="grid-column: span 2;"]:last-child {
+    grid-column: span 1 !important;
+  }
+
+  /* ===== Responsive Tables ===== */
   .table thead {
     display: none;
   }
@@ -1366,13 +1507,14 @@ h4 { font-size: var(--text-xl); }
   }
 
   .table td {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
     text-align: left;
+    word-break: break-word;
   }
 
   .table tr td:last-child {
@@ -1384,10 +1526,17 @@ h4 { font-size: var(--text-xl); }
   .table td:last-child > div {
     width: 100%;
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .table td > div {
     width: 100%;
+  }
+
+  /* Action buttons inside table cells */
+  .table td .btn,
+  .table td button {
+    font-size: 0.8rem !important;
   }
 
   .filter-bar {
@@ -1395,18 +1544,30 @@ h4 { font-size: var(--text-xl); }
     flex-wrap: nowrap;
     padding-bottom: var(--space-sm);
   }
+
+  /* Panels tighter on mobile */
+  .panel {
+    padding: 14px !important;
+  }
 }
 
 @media (max-width: 480px) {
   .grid-stats {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr !important;
   }
 
   .stat-card-value {
-    font-size: var(--text-2xl);
+    font-size: 1.1rem !important;
   }
 
   .tabs {
     overflow-x: auto;
   }
+
+  /* Even smaller button text */
+  .btn {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
 }
+
