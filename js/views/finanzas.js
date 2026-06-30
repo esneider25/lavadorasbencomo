@@ -10,10 +10,19 @@ export async function init(db) {
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; background: var(--bg-card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
       <button id="btn-nuevo-pago" class="btn btn-primary" style="border-radius: 8px; padding: 10px 20px; font-weight: bold;"><i class="fa-solid fa-plus"></i> Registrar Pago</button>
       
-      <div style="display: flex; gap: 10px;">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
         <button class="btn btn-sm btn-filter active" data-filter="hoy" style="border-radius: 8px; padding: 8px 15px; background: var(--bg-card-hover); border: 1px solid var(--border-color);">Hoy</button>
         <button class="btn btn-sm btn-filter" data-filter="mes" style="border-radius: 8px; padding: 8px 15px; background: transparent; border: 1px solid var(--border-color);">Este Mes</button>
         <button class="btn btn-sm btn-filter" data-filter="todos" style="border-radius: 8px; padding: 8px 15px; background: transparent; border: 1px solid var(--border-color);">Todos</button>
+        
+        <!-- Filtro Rango de Fechas -->
+        <div style="display: flex; align-items: center; gap: 5px; margin-left: 10px; border-left: 1px solid var(--border-color); padding-left: 10px;">
+           <span style="font-size: 0.8rem; color: #94a3b8;">Desde:</span>
+           <input type="date" id="filtro-fecha-inicio" class="input" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color-scheme: dark;">
+           <span style="font-size: 0.8rem; color: #94a3b8;">Hasta:</span>
+           <input type="date" id="filtro-fecha-fin" class="input" style="padding: 4px 8px; font-size: 0.8rem; border-radius: 6px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color-scheme: dark;">
+           <button id="btn-filtro-rango" class="btn btn-sm" style="background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 6px; padding: 5px 10px;" title="Aplicar Rango"><i class="fa-solid fa-filter"></i></button>
+        </div>
       </div>
     </div>
 
@@ -45,7 +54,7 @@ export async function init(db) {
           <i class="fa-solid fa-vault"></i>
         </div>
         <div>
-          <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px;">Ingresos Históricos</div>
+          <div id="lbl-fin-total" style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px;">Ingresos Históricos</div>
           <strong id="res-fin-total" style="font-size: 1.4rem; color: white;">$0.00</strong>
         </div>
       </div>
@@ -108,6 +117,12 @@ export async function init(db) {
   const form = document.getElementById('form-pagos');
   
   let currentFilter = 'hoy';
+  let filterStart = null;
+  let filterEnd = null;
+
+  const btnFiltroRango = document.getElementById('btn-filtro-rango');
+  const inputFechaInicio = document.getElementById('filtro-fecha-inicio');
+  const inputFechaFin = document.getElementById('filtro-fecha-fin');
 
   // Filters setup
   const filterBtns = document.querySelectorAll('.btn-filter');
@@ -123,6 +138,28 @@ export async function init(db) {
       currentFilter = e.target.getAttribute('data-filter');
       loadPagos();
     });
+  });
+
+  btnFiltroRango.addEventListener('click', () => {
+    if (!inputFechaInicio.value || !inputFechaFin.value) {
+       alert("Selecciona la fecha de 'Desde' y 'Hasta' para filtrar.");
+       return;
+    }
+    
+    filterBtns.forEach(b => {
+       b.classList.remove('active');
+       b.style.background = 'transparent';
+    });
+    
+    currentFilter = 'rango';
+    
+    const [sy, sm, sd] = inputFechaInicio.value.split('-');
+    const [ey, em, ed] = inputFechaFin.value.split('-');
+    
+    filterStart = new Date(sy, sm - 1, sd, 0, 0, 0).getTime();
+    filterEnd = new Date(ey, em - 1, ed, 23, 59, 59).getTime();
+
+    loadPagos();
   });
 
   btnNuevo.onclick = () => {
@@ -150,17 +187,28 @@ export async function init(db) {
       let totalHoy = 0;
       let totalMes = 0;
       let totalHistorico = 0;
+      let totalRango = 0;
 
       pagos.forEach(p => {
          const m = parseFloat(p.monto || 0);
          totalHistorico += m;
          if (p.fecha >= inicioHoy) totalHoy += m;
          if (p.fecha >= inicioMes) totalMes += m;
+         if (currentFilter === 'rango' && p.fecha >= filterStart && p.fecha <= filterEnd) {
+             totalRango += m;
+         }
       });
 
       document.getElementById('res-fin-hoy').textContent = `$${totalHoy.toFixed(2)}`;
       document.getElementById('res-fin-mes').textContent = `$${totalMes.toFixed(2)}`;
-      document.getElementById('res-fin-total').textContent = `$${totalHistorico.toFixed(2)}`;
+      
+      if (currentFilter === 'rango') {
+          document.getElementById('lbl-fin-total').textContent = 'Ingresos en Rango';
+          document.getElementById('res-fin-total').textContent = `$${totalRango.toFixed(2)}`;
+      } else {
+          document.getElementById('lbl-fin-total').textContent = 'Ingresos Históricos';
+          document.getElementById('res-fin-total').textContent = `$${totalHistorico.toFixed(2)}`;
+      }
 
       // Filtrar la tabla según el botón activo
       let pagosFiltrados = pagos;
@@ -168,6 +216,8 @@ export async function init(db) {
          pagosFiltrados = pagos.filter(p => p.fecha >= inicioHoy);
       } else if (currentFilter === 'mes') {
          pagosFiltrados = pagos.filter(p => p.fecha >= inicioMes);
+      } else if (currentFilter === 'rango') {
+         pagosFiltrados = pagos.filter(p => p.fecha >= filterStart && p.fecha <= filterEnd);
       }
 
       if (pagosFiltrados.length === 0) {
