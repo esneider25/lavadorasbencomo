@@ -1,7 +1,7 @@
 import { alquileresService } from '../services/alquileresService.js';
 import { clientesService } from '../services/clientesService.js';
 import { lavadorasService } from '../services/lavadorasService.js';
-import { pagosService } from '../services/pagosService.js'; // Nuevo para vincular pagos
+import { pagosService } from '../services/pagosService.js';
 
 export async function init(db) {
   const contentDiv = document.getElementById('alquileres-content');
@@ -24,10 +24,15 @@ export async function init(db) {
       </form>
     </div>
 
-    <!-- TABS -->
-    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-      <button class="btn btn-primary" id="tab-activos">Activos / En Proceso</button>
-      <button class="btn" style="background: rgba(255,255,255,0.1); color: #cbd5e1;" id="tab-completados">Historial Completados</button>
+    <!-- TABS Y BUSCADOR -->
+    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-primary" id="tab-activos">Activos / En Proceso</button>
+        <button class="btn" style="background: rgba(255,255,255,0.1); color: #cbd5e1;" id="tab-completados">Historial Completados</button>
+      </div>
+      <div>
+        <input type="text" id="alq-buscar" placeholder="🔍 Buscar cliente o lavadora..." class="input" style="width: 250px;">
+      </div>
     </div>
 
     <div class="panel">
@@ -37,7 +42,7 @@ export async function init(db) {
             <tr>
               <th>Lavadora</th>
               <th>Cliente</th>
-              <th>Entrega</th>
+              <th>Tiempos</th>
               <th>Logística</th>
               <th>Pagos / Deuda</th>
               <th>Acciones Rápidas</th>
@@ -90,6 +95,9 @@ export async function init(db) {
   const tabActivos = document.getElementById('tab-activos');
   const tabCompletados = document.getElementById('tab-completados');
   let currentTab = 'activos'; // 'activos' o 'completados'
+  
+  // Buscador
+  const inputBuscar = document.getElementById('alq-buscar');
 
   // Modal
   const modalPago = document.getElementById('modal-pago');
@@ -116,12 +124,16 @@ export async function init(db) {
     loadAlquileres();
   });
 
+  inputBuscar.addEventListener('input', () => {
+    loadAlquileres();
+  });
+
   // Cargar selects
   async function loadSelects() {
     try {
       const clientes = await clientesService.getAll('nombre', 'asc');
       selectCliente.innerHTML = '<option value="" disabled selected>Seleccione un Cliente</option>' + 
-        clientes.map(c => `<option value="${c.id}" data-direccion="${c.direccion || ''}">${c.nombre}</option>`).join('');
+        clientes.map(c => `<option value="${c.id}" data-direccion="${c.direccion || ''}" data-telefono="${c.telefono || ''}">${c.nombre}</option>`).join('');
 
       const lavadoras = await lavadorasService.getDisponibles();
       selectLavadora.innerHTML = '<option value="" disabled selected>Seleccione una Lavadora</option>' + 
@@ -134,6 +146,16 @@ export async function init(db) {
   async function loadAlquileres() {
     try {
       let alquileres = await alquileresService.getAll();
+      const searchTerm = inputBuscar.value.toLowerCase().trim();
+      
+      // Filtrar por texto
+      if (searchTerm) {
+        alquileres = alquileres.filter(a => {
+          const cliName = (a.clienteNombre || '').toLowerCase();
+          const lavId = (a.id_lavadora || '').toLowerCase();
+          return cliName.includes(searchTerm) || lavId.includes(searchTerm);
+        });
+      }
       
       // Filtrar por pestaña
       if (currentTab === 'activos') {
@@ -145,7 +167,7 @@ export async function init(db) {
       }
 
       if (alquileres.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">No hay alquileres ${currentTab}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 30px;">No hay resultados encontrados.</td></tr>`;
         return;
       }
 
@@ -157,9 +179,35 @@ export async function init(db) {
         let actionButtons = '';
         let repartidorLabel = a.repartidor ? `<div style="font-size: 0.8rem; color: #94a3b8; margin-top: 4px;"><i class="fa-solid fa-user-astronaut"></i> ${a.repartidor}</div>` : '';
         
-        let fecha = new Date(a.fecha_inicio).toLocaleDateString();
-        let hora = a.hora_entrega ? `<br><small style="color:#94a3b8;"><i class="fa-regular fa-clock"></i> ${a.hora_entrega}</small>` : '';
+        // --- WhatsApp Logic ---
+        let telFormat = '';
+        if (a.clienteTelefono) {
+           let cleanPhone = a.clienteTelefono.replace(/\\D/g, '');
+           if (cleanPhone.length >= 10) {
+             if (cleanPhone.startsWith('0')) {
+                cleanPhone = '58' + cleanPhone.substring(1);
+             }
+             let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent('Hola ' + (a.clienteNombre || '') + ', te contactamos de LavaGestión Pro.')}`;
+             telFormat = `<a href="${waUrl}" target="_blank" title="Escribir por WhatsApp" style="color: #25D366; margin-left: 5px; font-size: 1.2em; text-decoration: none;"><i class="fa-brands fa-whatsapp"></i></a>`;
+           }
+        }
+        
         let direccionHtml = a.clienteDireccion ? `<br><small style="color: #94a3b8;"><i class="fa-solid fa-location-dot"></i> ${a.clienteDireccion}</small>` : '';
+
+        // --- Tiempos y Fechas ---
+        let fecha = new Date(a.fecha_inicio).toLocaleDateString();
+        let hora = a.hora_entrega ? ` ${a.hora_entrega}` : '';
+        
+        let diasN = parseInt(a.dias) || 0;
+        let msVencimiento = a.fecha_inicio + (diasN * 86400000);
+        let fechaVenceStr = new Date(msVencimiento).toLocaleDateString();
+
+        let tiemposHtml = `
+          <div style="font-size: 0.85rem;">
+            <div style="color: #cbd5e1; margin-bottom: 3px;" title="Inicio y Entrega"><i class="fa-solid fa-play" style="color:#3b82f6; width:15px;"></i> ${fecha}${hora}</div>
+            <div style="color: #ef4444;" title="Vencimiento"><i class="fa-solid fa-stop" style="color:#ef4444; width:15px;"></i> ${fechaVenceStr}</div>
+          </div>
+        `;
 
         if (a.estado_alquiler === 'activo') {
           if (estadoLogistica === 'entrega_pendiente') {
@@ -208,15 +256,19 @@ export async function init(db) {
           <span class="badge badge-${pagoBadgeColor}">${pagoBadgeText}</span>
         `;
 
-        if (deuda > 0) {
+        if (deuda > 0 && currentTab !== 'completados') {
            actionButtons += `<button class="btn btn-sm" style="background: #10b981; color: white; width: 100%;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
         }
 
         return `
         <tr>
           <td class="text-mono">${a.id_lavadora}</td>
-          <td>${a.clienteNombre || a.id_cliente}${direccionHtml}<br><small style="color: #94a3b8;">${a.dias} días</small></td>
-          <td>${fecha}${hora}</td>
+          <td>
+            <strong>${a.clienteNombre || a.id_cliente}</strong> ${telFormat}
+            ${direccionHtml}
+            <br><small style="color: #94a3b8;">${a.dias} días</small>
+          </td>
+          <td>${tiemposHtml}</td>
           <td>
             <span class="badge badge-${logBadgeColor}"><div class="badge-dot"></div>${logBadgeText}</span>
             ${repartidorLabel}
@@ -329,6 +381,7 @@ export async function init(db) {
       const selectedOption = selectCliente.options[selectCliente.selectedIndex];
       const clienteText = selectedOption.text;
       const direccionCli = selectedOption.getAttribute('data-direccion');
+      const telefonoCli = selectedOption.getAttribute('data-telefono');
       
       const costoVal = document.getElementById('alq-costo').value;
 
@@ -336,10 +389,11 @@ export async function init(db) {
         id_cliente: clienteId,
         clienteNombre: clienteText,
         clienteDireccion: direccionCli,
+        clienteTelefono: telefonoCli,
         id_lavadora: idLavadora,
         dias: document.getElementById('alq-dias').value,
         costo_total: parseFloat(costoVal),
-        pagado: 0, // Al inicio no ha pagado nada (o paga luego por el modal)
+        pagado: 0, 
         repartidor: document.getElementById('alq-repartidor').value,
         hora_entrega: document.getElementById('alq-hora').value,
         estado_alquiler: 'activo',
