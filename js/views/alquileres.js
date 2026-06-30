@@ -7,50 +7,38 @@ export async function init(db) {
   const contentDiv = document.getElementById('alquileres-content');
   
   contentDiv.innerHTML = `
-    <div class="panel" style="margin-bottom: 20px;">
-      <h3>Crear Nuevo Alquiler</h3>
-      <form id="form-alquileres" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-        <select id="alq-cliente" required class="input" style="flex: 1; min-width: 150px;">
-          <option value="" disabled selected>Cargando clientes...</option>
-        </select>
-        <select id="alq-lavadora" required class="input" style="width: 150px;">
-          <option value="" disabled selected>Lavadoras...</option>
-        </select>
-        <input type="number" id="alq-dias" placeholder="Días" required class="input" style="width: 70px;">
-        <input type="number" id="alq-costo" placeholder="Costo Total ($)" required class="input" style="width: 120px;" step="0.01">
-        
-        <div style="display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px;">
-          <small style="color: #94a3b8;">Entrega:</small>
-          <input type="time" id="alq-hora" required class="input" style="width: 100px; padding: 4px;">
-        </div>
-        
-        <div style="display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 4px;">
-          <small style="color: #94a3b8;">Retiro:</small>
-          <input type="time" id="alq-hora-retiro" required class="input" style="width: 100px; padding: 4px;">
-        </div>
-
-        <input type="text" id="alq-repartidor" placeholder="Chofer" required class="input" style="width: 120px;">
-        <input type="text" id="alq-notas" placeholder="Notas (Opcional)" class="input" style="flex: 1; min-width: 150px;">
-        <button type="submit" class="btn btn-primary">Iniciar</button>
-      </form>
-    </div>
-
     <!-- TABS Y BUSCADOR -->
-    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-      <div style="display: flex; gap: 10px;">
-        <button class="btn btn-primary" id="tab-activos">Activos / En Proceso</button>
-        <button class="btn" style="background: rgba(255,255,255,0.1); color: #cbd5e1;" id="tab-completados">Historial Completados</button>
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between; margin-bottom: 20px; background: var(--bg-card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <div style="display: flex; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 8px;">
+        <button id="tab-activos" style="background: var(--accent-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Activos / En Proceso</button>
+        <button id="tab-completados" style="background: transparent; color: #94a3b8; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s;">Historial Completados</button>
       </div>
-      <div>
-        <input type="text" id="alq-buscar" placeholder="🔍 Buscar cliente o lavadora..." class="input" style="width: 250px;">
+      <div style="position: relative;">
+        <i class="fa-solid fa-search" style="position: absolute; left: 12px; top: 12px; color: #94a3b8;"></i>
+        <input type="text" id="alq-buscar" placeholder="Buscar cliente o lavadora..." class="input" style="width: 250px; padding-left: 35px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
       </div>
     </div>
 
-    <!-- MINI RESUMEN -->
-    <div id="mini-resumen" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 20px; align-items: center; font-size: 0.95rem;">
-      <strong><i class="fa-solid fa-chart-pie"></i> Resumen Activos:</strong> 
-      <span>Lavadoras en calle: <b id="res-lavadoras" style="color: white;">0</b></span>
-      <span>Dinero por cobrar: <b id="res-deuda" style="color: white;">$0</b></span>
+    <!-- MINI RESUMEN (TARJETAS) -->
+    <div id="mini-resumen" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+      <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+        <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); color: #10b981; display: flex; justify-content: center; align-items: center; font-size: 1.3rem;">
+          <i class="fa-solid fa-jug-detergent"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px;">Lavadoras en Calle</div>
+          <strong id="res-lavadoras" style="font-size: 1.3rem; color: white;">0</strong>
+        </div>
+      </div>
+      <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px;">
+        <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(59, 130, 246, 0.2); color: #3b82f6; display: flex; justify-content: center; align-items: center; font-size: 1.3rem;">
+          <i class="fa-solid fa-money-bill-trend-up"></i>
+        </div>
+        <div>
+          <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px;">Dinero por Cobrar</div>
+          <strong id="res-deuda" style="font-size: 1.3rem; color: white;">$0.00</strong>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
@@ -73,6 +61,66 @@ export async function init(db) {
       </div>
     </div>
 
+    <!-- MODAL DE CREAR ALQUILER -->
+    <div id="modal-nuevo-alquiler" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+      <div class="panel" style="width: 550px; max-width: 95%; position: relative; max-height: 90vh; overflow-y: auto;">
+        <button onclick="document.getElementById('modal-nuevo-alquiler').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.5rem; transition: 0.2s;"><i class="fa-solid fa-xmark"></i></button>
+        
+        <h2 style="margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-file-contract" style="color: var(--accent-blue);"></i> Nuevo Alquiler</h2>
+        
+        <form id="form-alquileres" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          
+          <div style="grid-column: span 2;">
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Cliente</label>
+            <select id="alq-cliente" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+              <option value="" disabled selected>Seleccione un Cliente...</option>
+            </select>
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Lavadora</label>
+            <select id="alq-lavadora" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+              <option value="" disabled selected>Seleccione una Lavadora...</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Días</label>
+            <input type="number" id="alq-dias" placeholder="Ej: 30" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          </div>
+          
+          <div>
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;">Costo Total ($)</label>
+            <input type="number" id="alq-costo" placeholder="0.00" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);" step="0.01">
+          </div>
+          
+          <div>
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-regular fa-clock"></i> Hora Entrega</label>
+            <input type="time" id="alq-hora" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          </div>
+          
+          <div>
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-regular fa-clock"></i> Hora Retiro</label>
+            <input type="time" id="alq-hora-retiro" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-solid fa-truck"></i> Chofer Asignado</label>
+            <input type="text" id="alq-repartidor" placeholder="Nombre del chofer" required class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 5px; display: block;"><i class="fa-solid fa-pen-to-square"></i> Notas Adicionales (Opcional)</label>
+            <input type="text" id="alq-notas" placeholder="Ej: Llamar antes de llegar" class="input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.2);">
+          </div>
+
+          <div style="grid-column: span 2; margin-top: 10px;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem; border-radius: 8px;">🚀 Iniciar Alquiler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- MODAL DE PAGO -->
     <div id="modal-pago" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
       <div class="panel" style="width: 400px; max-width: 90%; position: relative;">
@@ -84,18 +132,18 @@ export async function init(db) {
           <input type="hidden" id="pago-alquiler-id">
           <div>
             <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Monto a pagar ($)</label>
-            <input type="number" id="pago-monto" required class="input" style="width: 100%;" step="0.01">
+            <input type="number" id="pago-monto" required class="input" style="width: 100%; padding: 10px;" step="0.01">
           </div>
           <div>
             <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Método de Pago</label>
-            <select id="pago-metodo" required class="input" style="width: 100%;">
+            <select id="pago-metodo" required class="input" style="width: 100%; padding: 10px;">
               <option value="pago_movil">Pago Móvil</option>
               <option value="transferencia">Transferencia</option>
               <option value="efectivo_usd">Efectivo USD</option>
               <option value="efectivo_bs">Efectivo Bs</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary" style="background: #10b981; margin-top: 10px;">Guardar Pago</button>
+          <button type="submit" class="btn btn-primary" style="background: #10b981; margin-top: 10px; padding: 10px;">Guardar Pago</button>
         </form>
       </div>
     </div>
@@ -111,13 +159,13 @@ export async function init(db) {
           <input type="hidden" id="renovar-alquiler-id">
           <div>
             <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Días Extra a sumar</label>
-            <input type="number" id="renovar-dias" required class="input" style="width: 100%;" min="1" value="1">
+            <input type="number" id="renovar-dias" required class="input" style="width: 100%; padding: 10px;" min="1" value="1">
           </div>
           <div>
             <label style="font-size: 0.9rem; color: #94a3b8; display: block; margin-bottom: 5px;">Costo Extra a sumar ($)</label>
-            <input type="number" id="renovar-costo" required class="input" style="width: 100%;" step="0.01" value="0">
+            <input type="number" id="renovar-costo" required class="input" style="width: 100%; padding: 10px;" step="0.01" value="0">
           </div>
-          <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Renovar</button>
+          <button type="submit" class="btn btn-primary" style="margin-top: 10px; padding: 10px;">Renovar</button>
         </form>
       </div>
     </div>
@@ -136,6 +184,15 @@ export async function init(db) {
   const miniResumen = document.getElementById('mini-resumen');
   const resLavadoras = document.getElementById('res-lavadoras');
   const resDeuda = document.getElementById('res-deuda');
+
+  // Modal Nuevo Alquiler
+  const modalNuevoAlquiler = document.getElementById('modal-nuevo-alquiler');
+  const btnNuevoAlquiler = document.getElementById('btn-nuevo-alquiler');
+  if (btnNuevoAlquiler) {
+    btnNuevoAlquiler.onclick = () => {
+      modalNuevoAlquiler.style.display = 'flex';
+    };
+  }
 
   // Modal Pago
   const modalPago = document.getElementById('modal-pago');
@@ -512,13 +569,14 @@ export async function init(db) {
       await lavadorasService.cambiarEstado(idLavadora, 'alquilada');
 
       form.reset();
+      modalNuevoAlquiler.style.display = 'none';
       await loadSelects();
       await loadAlquileres();
     } catch (error) {
       alert('Error al guardar');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Iniciar';
+      btn.innerHTML = '🚀 Iniciar Alquiler';
     }
   });
 
