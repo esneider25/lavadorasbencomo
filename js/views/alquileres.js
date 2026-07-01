@@ -73,14 +73,18 @@ export async function init(db) {
           
           <div class="form-group" style="grid-column: span 2;">
             <label class="form-label">Cliente</label>
-            <input list="clientes-datalist" id="alq-cliente" required class="form-input" placeholder="🔍 Escriba para buscar cliente..." autocomplete="off">
-            <datalist id="clientes-datalist"></datalist>
+            <input type="text" id="alq-filtro-cliente" class="form-input" placeholder="🔍 Escriba para buscar cliente..." autocomplete="off" style="margin-bottom: 5px;">
+            <select id="alq-cliente" required class="form-select">
+              <option value="" disabled selected>Seleccione un Cliente...</option>
+            </select>
           </div>
 
           <div class="form-group" style="grid-column: span 2;">
             <label class="form-label">Lavadora</label>
-            <input list="lavadoras-datalist" id="alq-lavadora" required class="form-input" placeholder="🔍 Escriba para buscar lavadora..." autocomplete="off">
-            <datalist id="lavadoras-datalist"></datalist>
+            <input type="text" id="alq-filtro-lavadora" class="form-input" placeholder="🔍 Escriba para buscar lavadora..." autocomplete="off" style="margin-bottom: 5px;">
+            <select id="alq-lavadora" required class="form-select">
+              <option value="" disabled selected>Seleccione una Lavadora...</option>
+            </select>
           </div>
 
           <div class="form-group">
@@ -234,19 +238,37 @@ export async function init(db) {
     loadAlquileres();
   });
 
+  function renderClientes(filterText = '') {
+    const select = document.getElementById('alq-cliente');
+    const filtered = cachedClientes.filter(c => c.nombre.toLowerCase().includes(filterText.toLowerCase()));
+    select.innerHTML = '<option value="" disabled selected>Seleccione un Cliente...</option>' + 
+      filtered.map(c => `<option value="${c.id}" data-direccion="${c.direccion || ''}" data-telefono="${c.telefono || ''}">${c.nombre}</option>`).join('');
+  }
+
+  function renderLavadoras(filterText = '') {
+    const select = document.getElementById('alq-lavadora');
+    const filtered = cachedLavadoras.filter(l => \`Serial: \${l.serial} - \${l.modelo}\`.toLowerCase().includes(filterText.toLowerCase()));
+    select.innerHTML = '<option value="" disabled selected>Seleccione una Lavadora...</option>' + 
+      filtered.map(l => `<option value="${l.serial}">Serial: ${l.serial} - ${l.modelo}</option>`).join('');
+  }
+
+  const filtroCliente = document.getElementById('alq-filtro-cliente');
+  if (filtroCliente) {
+    filtroCliente.addEventListener('input', (e) => renderClientes(e.target.value));
+  }
+
+  const filtroLavadora = document.getElementById('alq-filtro-lavadora');
+  if (filtroLavadora) {
+    filtroLavadora.addEventListener('input', (e) => renderLavadoras(e.target.value));
+  }
+
   async function loadSelects() {
     try {
       cachedClientes = await clientesService.getAll('nombre', 'asc');
-      const datalistC = document.getElementById('clientes-datalist');
-      if (datalistC) {
-        datalistC.innerHTML = cachedClientes.map(c => `<option value="${c.nombre}"></option>`).join('');
-      }
+      renderClientes();
 
       cachedLavadoras = await lavadorasService.getDisponibles();
-      const datalistL = document.getElementById('lavadoras-datalist');
-      if (datalistL) {
-        datalistL.innerHTML = cachedLavadoras.map(l => `<option value="Serial: ${l.serial} - ${l.modelo}"></option>`).join('');
-      }
+      renderLavadoras();
     } catch (e) {
       console.error("Error cargando selects:", e);
     }
@@ -553,31 +575,23 @@ export async function init(db) {
     btn.textContent = '...';
 
     try {
-      const clienteInputVal = document.getElementById('alq-cliente').value;
-      const cliente = cachedClientes.find(c => c.nombre === clienteInputVal);
-      
-      if (!cliente) {
-        alert('Por favor, seleccione un cliente válido de la lista.');
-        btn.disabled = false;
-        btn.innerHTML = '🚀 Iniciar Alquiler';
-        return;
-      }
-      
-      const lavadoraInputVal = document.getElementById('alq-lavadora').value;
-      const lavadora = cachedLavadoras.find(l => `Serial: ${l.serial} - ${l.modelo}` === lavadoraInputVal);
-      
-      if (!lavadora) {
-        alert('Por favor, seleccione una lavadora válida de la lista.');
-        btn.disabled = false;
-        btn.innerHTML = '🚀 Iniciar Alquiler';
-        return;
-      }
+      const selectLavadora = document.getElementById('alq-lavadora');
+      const selectCliente = document.getElementById('alq-cliente');
 
-      const idLavadora = lavadora.serial;
-      const clienteId = cliente.id;
-      const clienteText = cliente.nombre;
-      const direccionCli = cliente.direccion || '';
-      const telefonoCli = cliente.telefono || '';
+      const idLavadora = selectLavadora.value;
+      const clienteId = selectCliente.value;
+      
+      if (!clienteId || !idLavadora) {
+        alert('Por favor seleccione cliente y lavadora.');
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Iniciar Alquiler';
+        return;
+      }
+      
+      const selectedOption = selectCliente.options[selectCliente.selectedIndex];
+      const clienteText = selectedOption.text;
+      const direccionCli = selectedOption.getAttribute('data-direccion');
+      const telefonoCli = selectedOption.getAttribute('data-telefono');
       
       const repartidorVal = document.getElementById('alq-repartidor').value;
       const horaVal = document.getElementById('alq-hora').value;
