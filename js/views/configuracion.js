@@ -128,7 +128,7 @@ import { configuracionService } from '../services/configuracionService.js';expor
     const chatId = chatIdInput.value.trim();
 
     if (!token || !chatId) {
-      alert('Por favor, ingresa el Token y el Chat ID primero.');
+      window.appAlert('Por favor, ingresa el Token y el Chat ID primero.');
       return;
     }
 
@@ -150,7 +150,7 @@ import { configuracionService } from '../services/configuracionService.js';expor
         btn.innerHTML = originalText;
       }, 3000);
     } else {
-      alert('Error al enviar. Revisa que el Token y Chat ID sean correctos y que le hayas dado /start al bot.');
+      window.appAlert('Error al enviar. Revisa que el Token y Chat ID sean correctos y que le hayas dado /start al bot.');
       btn.disabled = false;
       btn.innerHTML = originalText;
     }

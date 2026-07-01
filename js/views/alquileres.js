@@ -458,17 +458,17 @@ export async function init(db) {
       await alquileresService.update(idAlquiler, { estado_logistica: nuevoEstado });
       await loadAlquileres();
     } catch (e) {
-      alert('Error: ' + e.message);
+      window.appAlert('Error: ' + e.message);
     }
   };
 
   window.finalizarAlquiler = async (idAlquiler, idLavadora) => {
-    if (!confirm('¿Marcar para recogida?')) return;
+    if (!await window.appConfirm('¿Marcar para recogida?')) return;
     try {
       await alquileresService.finalizar(idAlquiler);
       await loadAlquileres();
     } catch (e) {
-      alert('Error: ' + e.message);
+      window.appAlert('Error: ' + e.message);
     }
   };
 
@@ -479,17 +479,17 @@ export async function init(db) {
       await loadAlquileres();
       await loadSelects(); 
     } catch (e) {
-      alert('Error: ' + e.message);
+      window.appAlert('Error: ' + e.message);
     }
   };
 
   window.eliminarRegistro = async (idAlquiler) => {
-    if (!confirm('¿Eliminar del historial?')) return;
+    if (!await window.appConfirm('¿Eliminar del historial?')) return;
     try {
       await alquileresService.delete(idAlquiler);
       await loadAlquileres();
     } catch (e) {
-      alert('Error: ' + e.message);
+      window.appAlert('Error: ' + e.message);
     }
   };
 
@@ -527,7 +527,7 @@ export async function init(db) {
       modalPago.style.display = 'none';
       await loadAlquileres();
     } catch (error) {
-      alert('Error al registrar pago');
+      window.appAlert('Error al registrar pago');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Guardar Pago';
@@ -566,7 +566,7 @@ export async function init(db) {
       modalRenovar.style.display = 'none';
       await loadAlquileres();
     } catch (error) {
-      alert('Error al renovar alquiler');
+      window.appAlert('Error al renovar alquiler');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Renovar';
@@ -588,7 +588,7 @@ export async function init(db) {
       const clienteId = selectCliente.value;
       
       if (!clienteId || !idLavadora) {
-        alert('Por favor seleccione cliente y lavadora.');
+        window.appAlert('Por favor seleccione cliente y lavadora.');
         btn.disabled = false;
         btn.innerHTML = '🚀 Iniciar Alquiler';
         return;
@@ -636,7 +636,7 @@ export async function init(db) {
       await loadSelects();
       await loadAlquileres();
     } catch (error) {
-      alert('Error al guardar');
+      window.appAlert('Error al guardar');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '🚀 Iniciar Alquiler';

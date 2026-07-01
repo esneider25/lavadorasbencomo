@@ -152,7 +152,7 @@ export async function init(db) {
 
   btnFiltroRango.addEventListener('click', () => {
     if (!inputFechaInicio.value || !inputFechaFin.value) {
-       alert("Selecciona la fecha de 'Desde' y 'Hasta' para filtrar.");
+       window.appAlert("Selecciona la fecha de 'Desde' y 'Hasta' para filtrar.");
        return;
     }
     
@@ -270,12 +270,12 @@ export async function init(db) {
   }
 
   window.eliminarGasto = async (id) => {
-    if (!confirm('¿Seguro que quieres eliminar este gasto?')) return;
+    if (!await window.appConfirm('¿Seguro que quieres eliminar este gasto?')) return;
     try {
       await gastosService.delete(id);
       await loadGastos();
     } catch (e) {
-      alert('Error al eliminar: ' + e.message);
+      window.appAlert('Error al eliminar: ' + e.message);
     }
   };
 
@@ -297,7 +297,7 @@ export async function init(db) {
       modalNuevo.style.display = 'none';
       await loadGastos();
     } catch (error) {
-      alert('Error al guardar el gasto');
+      window.appAlert('Error al guardar el gasto');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '💸 Guardar Gasto';

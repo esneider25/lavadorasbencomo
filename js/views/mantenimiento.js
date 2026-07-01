@@ -154,7 +154,7 @@ export async function init(db) {
 
   btnFiltroRango.addEventListener('click', () => {
     if (!inputFechaInicio.value || !inputFechaFin.value) {
-       alert("Selecciona la fecha de 'Desde' y 'Hasta' para filtrar.");
+       window.appAlert("Selecciona la fecha de 'Desde' y 'Hasta' para filtrar.");
        return;
     }
     
@@ -272,17 +272,17 @@ export async function init(db) {
       await mantenimientoService.update(id, { estado: nuevoEstado });
       await loadMantenimientos();
     } catch (e) {
-      alert('Error al cambiar estado: ' + e.message);
+      window.appAlert('Error al cambiar estado: ' + e.message);
     }
   };
 
   window.eliminarMantenimiento = async (id) => {
-    if (!confirm('¿Seguro que quieres eliminar este registro de mantenimiento?')) return;
+    if (!await window.appConfirm('¿Seguro que quieres eliminar este registro de mantenimiento?')) return;
     try {
       await mantenimientoService.delete(id);
       await loadMantenimientos();
     } catch (e) {
-      alert('Error al eliminar: ' + e.message);
+      window.appAlert('Error al eliminar: ' + e.message);
     }
   };
 
@@ -307,7 +307,7 @@ export async function init(db) {
       modalNuevo.style.display = 'none';
       await loadMantenimientos();
     } catch (error) {
-      alert('Error al guardar el mantenimiento');
+      window.appAlert('Error al guardar el mantenimiento');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '🛠️ Guardar Registro';

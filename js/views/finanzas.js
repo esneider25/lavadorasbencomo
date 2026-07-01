@@ -149,7 +149,7 @@ export async function init(db) {
 
   btnFiltroRango.addEventListener('click', () => {
     if (!inputFechaInicio.value || !inputFechaFin.value) {
-       alert("Selecciona la fecha de 'Desde' y 'Hasta' para filtrar.");
+       window.appAlert("Selecciona la fecha de 'Desde' y 'Hasta' para filtrar.");
        return;
     }
     
@@ -295,12 +295,12 @@ export async function init(db) {
   }
 
   window.eliminarPago = async (id) => {
-    if (!confirm('¿Seguro que quieres eliminar este pago? (Atención: esto NO descontará automáticamente la deuda de un alquiler, debes ajustarlo manual)')) return;
+    if (!await window.appConfirm('¿Seguro que quieres eliminar este pago? (Atención: esto NO descontará automáticamente la deuda de un alquiler, debes ajustarlo manual)')) return;
     try {
       await pagosService.delete(id);
       await loadPagos();
     } catch (e) {
-      alert('Error al eliminar: ' + e.message);
+      window.appAlert('Error al eliminar: ' + e.message);
     }
   };
 
@@ -321,7 +321,7 @@ export async function init(db) {
       modalNuevo.style.display = 'none';
       await loadPagos();
     } catch (error) {
-      alert('Error al registrar el pago');
+      window.appAlert('Error al registrar el pago');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '💰 Guardar Ingreso';
@@ -335,7 +335,7 @@ export async function init(db) {
       const globalConfig = await configuracionService.getGlobal() || {};
       const token = globalConfig.tg_bot_token || localStorage.getItem('tg_bot_token');
       const chatId = globalConfig.tg_chat_id || localStorage.getItem('tg_chat_id');
-       if (!token || !chatId) return alert('Configura tu bot de Telegram primero en Ajustes.');
+       if (!token || !chatId) return window.appAlert('Configura tu bot de Telegram primero en Ajustes.');
 
        btnTgCierre.disabled = true;
        const originalHtml = btnTgCierre.innerHTML;
@@ -365,11 +365,11 @@ export async function init(db) {
          });
 
          const success = await telegramService.sendCierreCaja(token, chatId, resumenData);
-         if (success) alert('✅ Cierre de caja enviado a Telegram con éxito.');
-         else alert('Error al enviar. Revisa la configuración del bot.');
+         if (success) window.appAlert('✅ Cierre de caja enviado a Telegram con éxito.');
+         else window.appAlert('Error al enviar. Revisa la configuración del bot.');
        } catch (e) {
          console.error(e);
-         alert('Error generando cierre: ' + e.message);
+         window.appAlert('Error generando cierre: ' + e.message);
        } finally {
          btnTgCierre.disabled = false;
          btnTgCierre.innerHTML = originalHtml;
@@ -383,7 +383,7 @@ export async function init(db) {
       const globalConfig = await configuracionService.getGlobal() || {};
       const token = globalConfig.tg_bot_token || localStorage.getItem('tg_bot_token');
       const chatId = globalConfig.tg_chat_id || localStorage.getItem('tg_chat_id');
-       if (!token || !chatId) return alert('Configura tu bot de Telegram primero en Ajustes.');
+       if (!token || !chatId) return window.appAlert('Configura tu bot de Telegram primero en Ajustes.');
 
        btnTgDeudores.disabled = true;
        const originalHtml = btnTgDeudores.innerHTML;
@@ -408,18 +408,18 @@ export async function init(db) {
          });
 
          if (pendientes.length === 0) {
-            alert('¡Genial! No tienes cobros pendientes.');
+            window.appAlert('¡Genial! No tienes cobros pendientes.');
             btnTgDeudores.disabled = false;
             btnTgDeudores.innerHTML = originalHtml;
             return;
          }
 
          const success = await telegramService.sendResumenPagos(token, chatId, pendientes);
-         if (success) alert('✅ Reporte de deudores enviado a Telegram.');
-         else alert('Error al enviar. Revisa la configuración del bot.');
+         if (success) window.appAlert('✅ Reporte de deudores enviado a Telegram.');
+         else window.appAlert('Error al enviar. Revisa la configuración del bot.');
        } catch (e) {
          console.error(e);
-         alert('Error generando reporte: ' + e.message);
+         window.appAlert('Error generando reporte: ' + e.message);
        } finally {
          btnTgDeudores.disabled = false;
          btnTgDeudores.innerHTML = originalHtml;

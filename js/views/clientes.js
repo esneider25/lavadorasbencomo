@@ -290,12 +290,12 @@ export async function init(db) {
   }
 
   window.eliminarCliente = async (id) => {
-    if (!confirm('¿Seguro que quieres eliminar este cliente? Se borrará permanentemente.')) return;
+    if (!await window.appConfirm('¿Seguro que quieres eliminar este cliente? Se borrará permanentemente.')) return;
     try {
       await clientesService.delete(id);
       await loadClientes();
     } catch (e) {
-      alert('Error al eliminar: ' + e.message);
+      window.appAlert('Error al eliminar: ' + e.message);
     }
   };
 
@@ -423,7 +423,7 @@ export async function init(db) {
       modalNuevo.style.display = 'none';
       await loadClientes();
     } catch (error) {
-      alert('Error al guardar el cliente');
+      window.appAlert('Error al guardar el cliente');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '💾 Guardar Cliente';
@@ -447,7 +447,7 @@ export async function init(db) {
       document.getElementById('modal-editar-cliente').style.display = 'none';
       await loadClientes();
     } catch (error) {
-      alert('Error al actualizar el cliente');
+      window.appAlert('Error al actualizar el cliente');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '💾 Guardar Cambios';

@@ -269,12 +269,12 @@ export async function init(db) {
   }
 
   window.eliminarLavadora = async (id) => {
-    if (!confirm('¿Seguro que quieres eliminar esta lavadora del inventario?')) return;
+    if (!await window.appConfirm('¿Seguro que quieres eliminar esta lavadora del inventario?')) return;
     try {
       await lavadorasService.delete(id);
       await loadLavadoras();
     } catch (e) {
-      alert('Error al eliminar: ' + e.message);
+      window.appAlert('Error al eliminar: ' + e.message);
     }
   };
 
@@ -286,12 +286,12 @@ export async function init(db) {
   };
 
   window.enviarMantenimiento = async (id) => {
-    if (!confirm('¿Seguro que quieres reportar esta lavadora como dañada / en mantenimiento?')) return;
+    if (!await window.appConfirm('¿Seguro que quieres reportar esta lavadora como dañada / en mantenimiento?')) return;
     try {
       await lavadorasService.cambiarEstado(id, 'mantenimiento');
       await loadLavadoras();
     } catch (e) {
-      alert('Error: ' + e.message);
+      window.appAlert('Error: ' + e.message);
     }
   };
 
@@ -451,7 +451,7 @@ export async function init(db) {
         document.getElementById('modal-reparar-lavadora').style.display = 'none';
         await loadLavadoras();
       } catch (error) {
-        alert('Error al guardar reparación: ' + error.message);
+        window.appAlert('Error al guardar reparación: ' + error.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = '✔️ Marcar como Disponible';
@@ -469,7 +469,7 @@ export async function init(db) {
       const modeloVal = document.getElementById('edit-lav-modelo').value.trim();
 
       if (!serialVal || serialVal.toLowerCase() === 'undefined') {
-        alert('Serial inválido o vacío.');
+        window.appAlert('Serial inválido o vacío.');
         return;
       }
 
@@ -484,7 +484,7 @@ export async function init(db) {
         document.getElementById('modal-editar-lavadora').style.display = 'none';
         await loadLavadoras();
       } catch (error) {
-        alert('Error al guardar: ' + error.message);
+        window.appAlert('Error al guardar: ' + error.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = '💾 Guardar Cambios';
@@ -499,7 +499,7 @@ export async function init(db) {
     const modeloVal = document.getElementById('lav-modelo').value.trim();
 
     if (!serialVal || serialVal.toLowerCase() === 'undefined') {
-      alert('Serial inválido o vacío. Por favor verifique.');
+      window.appAlert('Serial inválido o vacío. Por favor verifique.');
       return;
     }
 
@@ -517,7 +517,7 @@ export async function init(db) {
       modalNuevaLavadora.style.display = 'none';
       await loadLavadoras();
     } catch (error) {
-      alert('Error al guardar la lavadora');
+      window.appAlert('Error al guardar la lavadora');
     } finally {
       btn.disabled = false;
       btn.innerHTML = '💾 Registrar Equipo';

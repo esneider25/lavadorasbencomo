@@ -1,6 +1,70 @@
 // Lógica principal de la aplicación
 import { db, authService } from './firebase-config.js';
 
+// --- Global Custom Modals ---
+function createCustomModal(message, title, type = 'alert') {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = "position: fixed; inset: 0; background: var(--bg-modal-overlay); backdrop-filter: blur(4px); z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; padding: 20px;";
+    
+    const box = document.createElement('div');
+    box.style.cssText = "background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 16px 50px rgba(0,0,0,0.5); transform: scale(0.95); transition: transform 0.2s;";
+    
+    const isConfirm = type === 'confirm';
+    const iconColor = isConfirm ? 'var(--status-warning)' : 'var(--accent-blue)';
+    const iconClass = isConfirm ? 'fa-triangle-exclamation' : 'fa-circle-info';
+    
+    box.innerHTML = `
+      <h3 style="margin: 0 0 12px 0; font-size: 1.25rem; color: var(--text-primary); display: flex; align-items: center;">
+        <i class="fa-solid ${iconClass}" style="color: ${iconColor}; margin-right: 10px; font-size: 1.4rem;"></i>
+        ${title}
+      </h3>
+      <p style="margin: 0 0 24px 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">${message}</p>
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        ${isConfirm ? \`<button id="custom-modal-cancel" style="padding: 10px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; cursor: pointer; transition: background 0.2s; font-weight: 600;">Cancelar</button>\` : ''}
+        <button id="custom-modal-ok" style="padding: 10px 16px; background: var(--gradient-primary); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(59,130,246,0.3);">${isConfirm ? 'Confirmar' : 'Aceptar'}</button>
+      </div>
+    `;
+    
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    
+    // anim
+    setTimeout(() => {
+      overlay.style.opacity = '1';
+      box.style.transform = 'scale(1)';
+    }, 10);
+    
+    const close = (result) => {
+      overlay.style.opacity = '0';
+      box.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        if (document.body.contains(overlay)) {
+          document.body.removeChild(overlay);
+        }
+        resolve(result);
+      }, 200);
+    };
+    
+    const btnOk = box.querySelector('#custom-modal-ok');
+    btnOk.addEventListener('click', () => close(true));
+    btnOk.addEventListener('mouseover', () => btnOk.style.transform = 'scale(1.02)');
+    btnOk.addEventListener('mouseout', () => btnOk.style.transform = 'scale(1)');
+    
+    if (isConfirm) {
+      const btnCancel = box.querySelector('#custom-modal-cancel');
+      btnCancel.addEventListener('click', () => close(false));
+      btnCancel.addEventListener('mouseover', () => btnCancel.style.background = 'rgba(255,255,255,0.1)');
+      btnCancel.addEventListener('mouseout', () => btnCancel.style.background = 'rgba(255,255,255,0.05)');
+    }
+  });
+}
+
+window.appAlert = (message, title = 'Aviso') => createCustomModal(message, title, 'alert');
+window.appConfirm = (message, title = 'Confirmar Acción') => createCustomModal(message, title, 'confirm');
+// ------------------------------
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginScreen = document.getElementById('login-screen');
   const appContainer = document.getElementById('app-container');
