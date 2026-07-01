@@ -2,6 +2,7 @@ import { pagosService } from '../services/pagosService.js';
 import { alquileresService } from '../services/alquileresService.js';
 import { clientesService } from '../services/clientesService.js';
 import { telegramService } from '../services/telegramService.js';
+import { configuracionService } from '../services/configuracionService.js';
 
 export async function init(db) {
   const contentDiv = document.getElementById('finanzas-content');
@@ -315,8 +316,9 @@ export async function init(db) {
   const btnTgCierre = document.getElementById('btn-tg-cierre');
   if (btnTgCierre) {
     btnTgCierre.addEventListener('click', async () => {
-       const token = localStorage.getItem('tg_bot_token');
-       const chatId = localStorage.getItem('tg_chat_id');
+      const globalConfig = await configuracionService.getGlobal() || {};
+      const token = globalConfig.tg_bot_token || localStorage.getItem('tg_bot_token');
+      const chatId = globalConfig.tg_chat_id || localStorage.getItem('tg_chat_id');
        if (!token || !chatId) return alert('Configura tu bot de Telegram primero en Ajustes.');
 
        btnTgCierre.disabled = true;
@@ -362,8 +364,9 @@ export async function init(db) {
   const btnTgDeudores = document.getElementById('btn-tg-deudores');
   if (btnTgDeudores) {
     btnTgDeudores.addEventListener('click', async () => {
-       const token = localStorage.getItem('tg_bot_token');
-       const chatId = localStorage.getItem('tg_chat_id');
+      const globalConfig = await configuracionService.getGlobal() || {};
+      const token = globalConfig.tg_bot_token || localStorage.getItem('tg_bot_token');
+      const chatId = globalConfig.tg_chat_id || localStorage.getItem('tg_chat_id');
        if (!token || !chatId) return alert('Configura tu bot de Telegram primero en Ajustes.');
 
        btnTgDeudores.disabled = true;

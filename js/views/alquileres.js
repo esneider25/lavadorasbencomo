@@ -3,6 +3,7 @@ import { clientesService } from '../services/clientesService.js';
 import { lavadorasService } from '../services/lavadorasService.js';
 import { pagosService } from '../services/pagosService.js';
 import { telegramService } from '../services/telegramService.js';
+import { configuracionService } from '../services/configuracionService.js';
 
 export async function init(db) {
   const contentDiv = document.getElementById('alquileres-content');
@@ -648,8 +649,9 @@ export async function init(db) {
   // --- TELEGRAM WATCHER (RELOJ VIGILANTE) ---
   // Se ejecuta cada 60 segundos (60000 ms)
   setInterval(async () => {
-    const token = localStorage.getItem('tg_bot_token');
-    const chatId = localStorage.getItem('tg_chat_id');
+    const globalConfig = await configuracionService.getGlobal() || {};
+    const token = globalConfig.tg_bot_token || localStorage.getItem('tg_bot_token');
+    const chatId = globalConfig.tg_chat_id || localStorage.getItem('tg_chat_id');
     if (!token || !chatId) return; // Si no hay configuración, no hace nada
 
     try {

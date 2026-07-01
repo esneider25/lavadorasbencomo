@@ -1,6 +1,5 @@
 import { telegramService } from '../services/telegramService.js';
-
-export async function init(db) {
+import { configuracionService } from '../services/configuracionService.js';export async function init(db) {
   const contentDiv = document.getElementById('configuracion-content');
   
   contentDiv.innerHTML = `
@@ -94,14 +93,23 @@ export async function init(db) {
   const tokenInput = document.getElementById('tg-token');
   const chatIdInput = document.getElementById('tg-chatid');
 
-  // Load from localStorage
-  tokenInput.value = localStorage.getItem('tg_bot_token') || '';
-  chatIdInput.value = localStorage.getItem('tg_chat_id') || '';
+  // Load from Firebase via configuracionService
+  const globalConfig = await configuracionService.getGlobal() || {};
+  tokenInput.value = globalConfig.tg_bot_token || localStorage.getItem('tg_bot_token') || '';
+  chatIdInput.value = globalConfig.tg_chat_id || localStorage.getItem('tg_chat_id') || '';
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // Fallback in localStorage just in case (optional, but good for migrating)
     localStorage.setItem('tg_bot_token', tokenInput.value.trim());
     localStorage.setItem('tg_chat_id', chatIdInput.value.trim());
+    
+    // Save to Firebase
+    await configuracionService.saveGlobal({
+      tg_bot_token: tokenInput.value.trim(),
+      tg_chat_id: chatIdInput.value.trim()
+    });
     
     // Nice visual feedback instead of alert
     const btn = form.querySelector('button[type="submit"]');
