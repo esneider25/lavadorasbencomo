@@ -3,7 +3,7 @@ import { db, authService } from './firebase-config.js';
 
 // --- Global Custom Modals ---
 function createCustomModal(message, title, type = 'alert') {
-  return new Promise(resolve => {
+  return new Promise(resolve =>  {
     const overlay = document.createElement('div');
     overlay.style.cssText = "position: fixed; inset: 0; background: var(--bg-modal-overlay); backdrop-filter: blur(4px); z-index: 99999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; padding: 20px;";
     
@@ -21,7 +21,7 @@ function createCustomModal(message, title, type = 'alert') {
       </h3>
       <p style="margin: 0 0 24px 0; color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5;">${message}</p>
       <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        ${isConfirm ? \`<button id="custom-modal-cancel" style="padding: 10px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; cursor: pointer; transition: background 0.2s; font-weight: 600;">Cancelar</button>\` : ''}
+        ${isConfirm ? `<button id="custom-modal-cancel" style="padding: 10px 16px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; cursor: pointer; transition: background 0.2s; font-weight: 600;">Cancelar</button>` : ''}
         <button id="custom-modal-ok" style="padding: 10px 16px; background: var(--gradient-primary); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(59,130,246,0.3);">${isConfirm ? 'Confirmar' : 'Aceptar'}</button>
       </div>
     `;
