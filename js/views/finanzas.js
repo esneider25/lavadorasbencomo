@@ -1,6 +1,7 @@
 import { pagosService } from '../services/pagosService.js';
 import { alquileresService } from '../services/alquileresService.js';
 import { clientesService } from '../services/clientesService.js';
+import { lavadorasService } from '../services/lavadorasService.js';
 import { telegramService } from '../services/telegramService.js';
 import { configuracionService } from '../services/configuracionService.js';
 
@@ -177,6 +178,7 @@ export async function init(db) {
       const pagos = await pagosService.getAll('fecha', 'desc');
       const alquileres = await alquileresService.getAll();
       const clientes = await clientesService.getAll();
+      const lavadoras = await lavadorasService.getAll();
 
       // Mapear alquileres y clientes para rápido acceso
       const mapAlquileres = {};
@@ -184,6 +186,9 @@ export async function init(db) {
 
       const mapClientes = {};
       clientes.forEach(c => mapClientes[c.id] = c);
+      
+      const mapLavadoras = {};
+      lavadoras.forEach(l => mapLavadoras[l.id] = l);
 
       // Calcular fechas para filtros y resúmenes
       const ahora = new Date();
@@ -239,11 +244,22 @@ export async function init(db) {
            if (alq) {
               const cli = mapClientes[alq.id_cliente];
               const nombreCli = cli ? cli.nombre : 'Cliente Eliminado';
-              const lavId = alq.id_lavadora || '?';
+              const lavId = alq.id_lavadora;
+              const lavInfo = mapLavadoras[lavId];
+              
+              let displayLav = '';
+              if (lavInfo) {
+                  displayLav = `${lavInfo.modelo || 'Lavadora'} (Ser: ${lavInfo.serial || 'N/A'})`;
+              } else if (alq.lavadoraModelo) {
+                  displayLav = `${alq.lavadoraModelo} (Ser: ${alq.lavadoraSerial || 'N/A'})`;
+              } else {
+                  displayLav = `Lavadora (ID: ${lavId ? lavId.substring(0,6) : '?'})`;
+              }
+              
               textoAlquiler = `
               <div style="display:flex; flex-direction:column;">
                 <strong style="color:var(--text-primary); text-transform: capitalize;">${nombreCli}</strong>
-                <span style="font-size:0.8rem; color:#8892a8;"><i class="fa-solid fa-jug-detergent" style="font-size:0.7rem;"></i> Lavadora ${lavId}</span>
+                <span style="font-size:0.8rem; color:#8892a8;"><i class="fa-solid fa-jug-detergent" style="font-size:0.7rem;"></i> ${displayLav}</span>
               </div>`;
            } else {
               textoAlquiler = `<span class="text-mono" style="font-size:0.8rem; color:#64748b;">ID: ${p.id_alquiler.substring(0,8)}...</span>`;
