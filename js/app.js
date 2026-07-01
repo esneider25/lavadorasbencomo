@@ -286,6 +286,14 @@ async function loadViewData(viewName) {
       module.init();
     }
   } catch (error) {
-    console.log(`Vista ${viewName} no implementada o error al cargar:`, error);
+    console.error(`Error al cargar la vista ${viewName}:`, error);
+    const contentDiv = document.getElementById(`${viewName}-content`);
+    if (contentDiv) {
+      contentDiv.innerHTML = `<div style="padding: 20px; color: #ef4444; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; text-align: center;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 10px;"></i>
+        <h3 style="margin-top: 0;">Error al cargar</h3>
+        <p style="margin-bottom: 0;">No se pudo cargar la vista de ${viewName}. Verifica tu conexión a internet o recarga la página.</p>
+      </div>`;
+    }
   }
 }
