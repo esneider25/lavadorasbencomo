@@ -251,7 +251,7 @@ export async function init(db) {
     const term = filterText.toLowerCase();
     const filtered = cachedLavadoras.filter(l => `Serial: ${l.serial || ''} - ${l.modelo || ''}`.toLowerCase().includes(term));
     select.innerHTML = '<option value="" disabled selected>Seleccione una Lavadora...</option>' + 
-      filtered.map(l => `<option value="${l.serial}">Serial: ${l.serial || ''} - ${l.modelo || ''}</option>`).join('');
+      filtered.map(l => `<option value="${l.id}" data-serial="${l.serial || ''}" data-modelo="${l.modelo || ''}">Serial: ${l.serial || ''} - ${l.modelo || ''}</option>`).join('');
   }
 
   const filtroCliente = document.getElementById('alq-filtro-cliente');
@@ -285,8 +285,9 @@ export async function init(db) {
       if (searchTerm) {
         alquileres = alquileres.filter(a => {
           const cliName = (a.clienteNombre || '').toLowerCase();
-          const lavId = (a.id_lavadora || '').toLowerCase();
-          return cliName.includes(searchTerm) || lavId.includes(searchTerm);
+          const lavModelo = (a.lavadoraModelo || '').toLowerCase();
+          const lavSerial = (a.lavadoraSerial || a.id_lavadora || '').toLowerCase();
+          return cliName.includes(searchTerm) || lavModelo.includes(searchTerm) || lavSerial.includes(searchTerm);
         });
       }
       
@@ -425,9 +426,11 @@ export async function init(db) {
            actionButtons += `<button class="btn btn-sm" style="flex: 1; background: #10b981; color: white;" onclick="window.abrirModalPago('${a.id}', ${deuda})">💸 Cobrar $${deuda}</button>`;
         }
 
+        let displayLavadora = a.lavadoraModelo ? `${a.lavadoraModelo} <br><small style="color: #94a3b8;">Serial: ${a.lavadoraSerial || 'N/A'}</small>` : (a.id_lavadora || 'N/A');
+
         return `
         <tr>
-          <td class="text-mono" style="padding-bottom: 0;">${a.id_lavadora}</td>
+          <td style="padding-bottom: 0;">${displayLavadora}</td>
           <td>
             <strong>${a.clienteNombre || a.id_cliente}</strong> ${telFormat}
             ${direccionHtml}
@@ -594,6 +597,10 @@ export async function init(db) {
       const clienteText = selectedOption.text;
       const direccionCli = selectedOption.getAttribute('data-direccion');
       const telefonoCli = selectedOption.getAttribute('data-telefono');
+
+      const selectedLavOption = selectLavadora.options[selectLavadora.selectedIndex];
+      const lavadoraSerial = selectedLavOption.getAttribute('data-serial');
+      const lavadoraModelo = selectedLavOption.getAttribute('data-modelo');
       
       const repartidorVal = document.getElementById('alq-repartidor').value;
       const horaVal = document.getElementById('alq-hora').value;
@@ -607,6 +614,8 @@ export async function init(db) {
         clienteDireccion: direccionCli,
         clienteTelefono: telefonoCli,
         id_lavadora: idLavadora,
+        lavadoraSerial: lavadoraSerial,
+        lavadoraModelo: lavadoraModelo,
         dias: document.getElementById('alq-dias').value,
         costo_total: parseFloat(costoVal),
         pagado: 0, 
