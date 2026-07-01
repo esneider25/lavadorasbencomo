@@ -73,16 +73,14 @@ export async function init(db) {
           
           <div class="form-group" style="grid-column: span 2;">
             <label class="form-label">Cliente</label>
-            <select id="alq-cliente" required class="form-select">
-              <option value="" disabled selected>Seleccione un Cliente...</option>
-            </select>
+            <input list="clientes-datalist" id="alq-cliente" required class="form-input" placeholder="🔍 Escriba para buscar cliente..." autocomplete="off">
+            <datalist id="clientes-datalist"></datalist>
           </div>
 
           <div class="form-group" style="grid-column: span 2;">
             <label class="form-label">Lavadora</label>
-            <select id="alq-lavadora" required class="form-select">
-              <option value="" disabled selected>Seleccione una Lavadora...</option>
-            </select>
+            <input list="lavadoras-datalist" id="alq-lavadora" required class="form-input" placeholder="🔍 Escriba para buscar lavadora..." autocomplete="off">
+            <datalist id="lavadoras-datalist"></datalist>
           </div>
 
           <div class="form-group">
@@ -186,6 +184,9 @@ export async function init(db) {
   const resLavadoras = document.getElementById('res-lavadoras');
   const resDeuda = document.getElementById('res-deuda');
 
+  let cachedClientes = [];
+  let cachedLavadoras = [];
+
   // Modal Nuevo Alquiler
   const modalNuevoAlquiler = document.getElementById('modal-nuevo-alquiler');
   const btnNuevoAlquiler = document.getElementById('btn-nuevo-alquiler');
@@ -235,13 +236,17 @@ export async function init(db) {
 
   async function loadSelects() {
     try {
-      const clientes = await clientesService.getAll('nombre', 'asc');
-      selectCliente.innerHTML = '<option value="" disabled selected>Seleccione un Cliente</option>' + 
-        clientes.map(c => `<option value="${c.id}" data-direccion="${c.direccion || ''}" data-telefono="${c.telefono || ''}">${c.nombre}</option>`).join('');
+      cachedClientes = await clientesService.getAll('nombre', 'asc');
+      const datalistC = document.getElementById('clientes-datalist');
+      if (datalistC) {
+        datalistC.innerHTML = cachedClientes.map(c => `<option value="${c.nombre}"></option>`).join('');
+      }
 
-      const lavadoras = await lavadorasService.getDisponibles();
-      selectLavadora.innerHTML = '<option value="" disabled selected>Seleccione una Lavadora</option>' + 
-        lavadoras.map(l => `<option value="${l.serial}">Serial: ${l.serial} - ${l.modelo}</option>`).join('');
+      cachedLavadoras = await lavadorasService.getDisponibles();
+      const datalistL = document.getElementById('lavadoras-datalist');
+      if (datalistL) {
+        datalistL.innerHTML = cachedLavadoras.map(l => `<option value="Serial: ${l.serial} - ${l.modelo}"></option>`).join('');
+      }
     } catch (e) {
       console.error("Error cargando selects:", e);
     }
@@ -548,12 +553,31 @@ export async function init(db) {
     btn.textContent = '...';
 
     try {
-      const idLavadora = selectLavadora.value;
-      const clienteId = selectCliente.value;
-      const selectedOption = selectCliente.options[selectCliente.selectedIndex];
-      const clienteText = selectedOption.text;
-      const direccionCli = selectedOption.getAttribute('data-direccion');
-      const telefonoCli = selectedOption.getAttribute('data-telefono');
+      const clienteInputVal = document.getElementById('alq-cliente').value;
+      const cliente = cachedClientes.find(c => c.nombre === clienteInputVal);
+      
+      if (!cliente) {
+        alert('Por favor, seleccione un cliente válido de la lista.');
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Iniciar Alquiler';
+        return;
+      }
+      
+      const lavadoraInputVal = document.getElementById('alq-lavadora').value;
+      const lavadora = cachedLavadoras.find(l => `Serial: ${l.serial} - ${l.modelo}` === lavadoraInputVal);
+      
+      if (!lavadora) {
+        alert('Por favor, seleccione una lavadora válida de la lista.');
+        btn.disabled = false;
+        btn.innerHTML = '🚀 Iniciar Alquiler';
+        return;
+      }
+
+      const idLavadora = lavadora.serial;
+      const clienteId = cliente.id;
+      const clienteText = cliente.nombre;
+      const direccionCli = cliente.direccion || '';
+      const telefonoCli = cliente.telefono || '';
       
       const repartidorVal = document.getElementById('alq-repartidor').value;
       const horaVal = document.getElementById('alq-hora').value;
