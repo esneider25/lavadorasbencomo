@@ -240,16 +240,18 @@ export async function init(db) {
 
   function renderClientes(filterText = '') {
     const select = document.getElementById('alq-cliente');
-    const filtered = cachedClientes.filter(c => c.nombre.toLowerCase().includes(filterText.toLowerCase()));
+    const term = filterText.toLowerCase();
+    const filtered = cachedClientes.filter(c => (c.nombre || '').toLowerCase().includes(term));
     select.innerHTML = '<option value="" disabled selected>Seleccione un Cliente...</option>' + 
-      filtered.map(c => `<option value="${c.id}" data-direccion="${c.direccion || ''}" data-telefono="${c.telefono || ''}">${c.nombre}</option>`).join('');
+      filtered.map(c => `<option value="${c.id}" data-direccion="${c.direccion || ''}" data-telefono="${c.telefono || ''}">${c.nombre || 'Sin nombre'}</option>`).join('');
   }
 
   function renderLavadoras(filterText = '') {
     const select = document.getElementById('alq-lavadora');
-    const filtered = cachedLavadoras.filter(l => \`Serial: \${l.serial} - \${l.modelo}\`.toLowerCase().includes(filterText.toLowerCase()));
+    const term = filterText.toLowerCase();
+    const filtered = cachedLavadoras.filter(l => `Serial: ${l.serial || ''} - ${l.modelo || ''}`.toLowerCase().includes(term));
     select.innerHTML = '<option value="" disabled selected>Seleccione una Lavadora...</option>' + 
-      filtered.map(l => `<option value="${l.serial}">Serial: ${l.serial} - ${l.modelo}</option>`).join('');
+      filtered.map(l => `<option value="${l.serial}">Serial: ${l.serial || ''} - ${l.modelo || ''}</option>`).join('');
   }
 
   const filtroCliente = document.getElementById('alq-filtro-cliente');
